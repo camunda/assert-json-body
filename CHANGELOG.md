@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/camunda/assert-json-body/compare/v1.0.1...v1.0.2) (2025-09-25)
+
+
+### Bug Fixes
+
+* publish package ([9221b3f](https://github.com/camunda/assert-json-body/commit/9221b3fc04f7c29346776e125f362f5508157c74))
+
 ## [1.0.1](https://github.com/camunda/assert-json-body/compare/v1.0.0...v1.0.1) (2025-09-25)
 
 
