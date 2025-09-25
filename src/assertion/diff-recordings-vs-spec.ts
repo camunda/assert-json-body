@@ -161,7 +161,7 @@ interface ResultRow {
 
 const results: ResultRow[] = [];
 
-for (const [key, agg] of aggIndex.entries()) {
+for (const [, agg] of aggIndex.entries()) {
   // Only attempt method/status exact matches in spec; skip wildcard ANY groups
   if (agg.method === 'ANY' || agg.status === 'ANY') continue;
   const sKey = specKey(agg.route, agg.method, agg.status);

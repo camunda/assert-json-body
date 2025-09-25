@@ -1,9 +1,9 @@
+/* eslint-disable no-empty */
 import { describe, it, expect, afterEach } from 'vitest';
 import { writeFileSync, mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import yaml from 'js-yaml';
-import { generate } from '../../lib/extractor.js';
 
 // This test exercises the generation of index.ts and performs simple static-like checks
 // (we don't invoke a TS compiler here; we assert structural expectations).

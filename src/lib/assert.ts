@@ -1,6 +1,6 @@
 import { pickRoute } from './responses.js';
 import { recordBody } from './recorder.js';
-import { validateResponseShape, _validateRouteContext } from './validator.js';
+import { _validateRouteContext } from './validator.js';
 import { RouteContext } from '../types/index.js';
 
 export interface AssertionSpec { path: string; method?: string; status?: string }

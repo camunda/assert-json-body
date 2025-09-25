@@ -6,7 +6,7 @@ import { extractResponses } from '../../lib/extractor.js';
 
 describe('discriminator mixed object vs primitive', () => {
   const specPath = join(__dirname, 'fixtures', 'discriminator-mixed.yaml');
-  const doc = yaml.load(readFileSync(specPath, 'utf8')) as any;
+  const doc = yaml.load(readFileSync(specPath, 'utf8'));
   const responses = extractResponses(doc);
 
   it('extracts 200 response for /job-result', () => {

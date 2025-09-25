@@ -81,8 +81,8 @@ export interface ResolvedExtractConfig extends Required<Pick<ExtractConfig,
   responsesFile?: string;
 }
 
-export interface ResolvedValidateConfig extends Required<Pick<ValidateConfig,
-  'recordResponses' | 'throwOnValidationFail'>> {}
+export type ResolvedValidateConfig = Required<Pick<ValidateConfig,
+  'recordResponses' | 'throwOnValidationFail'>>
 
 export interface ResolvedConfig {
   extract: ResolvedExtractConfig;

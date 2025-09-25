@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { flatten } from '../../extractor/src/lib/schema-flatten.js';
-import { normalizeType } from '../../extractor/src/lib/type-utils.js';
 import { pruneSchema } from '../../lib/extractor.js';
 import type { SchemaGroup as OutputSchema } from '../../types/index.js';
+import { OpenAPIV3 } from 'openapi-types';
 
 const components = {
   MergedEnum: {
@@ -22,14 +23,14 @@ describe('enum merging', () => {
         status: { allOf: [ { enum: ['A','B'] }, { enum: ['B','C'] }, { type: 'string' } ] }
       },
       required: ['status']
-    };
+    } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
   const field = out.required.find((f: any) => f.name === 'status');
     expect(field?.enumValues).toEqual(['A','B','C']);
   });
 
   it('merges enums via $ref wrapper', () => {
-    const schema = { type: 'object', properties: { code: { $ref: '#/components/schemas/MergedEnum' } }, required: ['code'] };
+    const schema = { type: 'object', properties: { code: { $ref: '#/components/schemas/MergedEnum' } }, required: ['code'] } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, components as any);
   const field = out.required.find((f: any) => f.name === 'code');
     expect(field?.enumValues).toEqual(['X','Y','Z']);
@@ -38,7 +39,7 @@ describe('enum merging', () => {
 
 describe('union (oneOf/anyOf) handling', () => {
   it('represents oneOf primitive union normalized (string|number)', () => {
-    const schema = { type: 'object', properties: { value: { oneOf: [ { type: 'string' }, { type: 'integer', format: 'int32' } ] } }, required: ['value'] };
+    const schema = { type: 'object', properties: { value: { oneOf: [ { type: 'string' }, { type: 'integer', format: 'int32' } ] } }, required: ['value'] } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
   const field = out.required.find((f: any) => f.name === 'value');
     // flatten applies describeType then normalizeType; ensure normalization collapsed integer
@@ -46,7 +47,7 @@ describe('union (oneOf/anyOf) handling', () => {
   });
 
   it('represents anyOf union', () => {
-    const schema = { type: 'object', properties: { data: { anyOf: [ { type: 'string' }, { type: 'integer', format: 'int64' } ] } } };
+    const schema = { type: 'object', properties: { data: { anyOf: [ { type: 'string' }, { type: 'integer', format: 'int64' } ] } } } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
   const field = out.optional.find((f: any) => f.name === 'data');
     // order should match traversal, normalization collapses integer
@@ -79,7 +80,7 @@ describe('mixed object + primitive unions', () => {
         }
       },
       required: ['payload']
-    };
+    } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
   const field = out.required.find((f: any) => f.name === 'payload');
     expect(field?.type).toBe('object|string');
@@ -97,7 +98,7 @@ describe('mixed object + primitive unions', () => {
           ]
         }
       }
-    };
+    } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
   const field = out.optional.find((f: any) => f.name === 'variant');
     expect(field?.type).toBe('array<number>|object|string');

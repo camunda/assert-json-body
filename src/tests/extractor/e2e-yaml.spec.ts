@@ -17,7 +17,7 @@ import { join } from 'node:path';
 
 describe('E2E YAML spec extraction', () => {
   const specPath = join(__dirname, 'fixtures', 'e2e-spec.yaml');
-  const doc = yaml.load(readFileSync(specPath, 'utf8')) as any;
+  const doc = yaml.load(readFileSync(specPath, 'utf8'));
   const responses = extractResponses(doc);
 
   it('captures both 200 and 404 responses for /instances/{id}', () => {

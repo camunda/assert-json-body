@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-require-imports */
 /* Simple CJS consumer test */
 const lib = require('./dist-cjs');
 console.log('CJS keys:', Object.keys(lib));

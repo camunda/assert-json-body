@@ -31,22 +31,22 @@ describe('validator positive cases (framework-agnostic)', () => {
 
 describe('validator negative cases (framework-agnostic)', () => {
   it('fails when required field missing', () => {
-    const body = { bpmnProcessId: 'proc', version: 1 } as any;
+    const body = { bpmnProcessId: 'proc', version: 1 };
     expect(() => validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body, { responsesFilePath: responsesFile })).toThrow(/MISSING.*processInstanceKey/i);
   });
 
   it('fails when required field wrong type', () => {
-    const body = { processInstanceKey: 'not-a-number', bpmnProcessId: 'proc', version: 1 } as any;
+    const body = { processInstanceKey: 'not-a-number', bpmnProcessId: 'proc', version: 1 };
     expect(() => validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body, { responsesFilePath: responsesFile })).toThrow(/processInstanceKey/);
   });
 
   it('fails when optional field wrong type (if present)', () => {
-    const body = { id: 'abc', state: 'DONE', description: 42, priority: 10, extra: { flag: true } } as any;
+    const body = { id: 'abc', state: 'DONE', description: 42, priority: 10, extra: { flag: true } };
     expect(() => validateResponseShape({ path: '/mixed/optional', method: 'GET', status: '200' }, body, { responsesFilePath: responsesFile })).toThrow(/description/);
   });
 
   it('fails for undeclared additional properties', () => {
-    const body = { processInstanceKey: 1, bpmnProcessId: 'p', version: 1, unexpected: 'extra' } as any;
+    const body = { processInstanceKey: 1, bpmnProcessId: 'p', version: 1, unexpected: 'extra' };
     expect(() => validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body, { responsesFilePath: responsesFile })).toThrow(/EXTRA/);
   });
 });

@@ -25,10 +25,10 @@ describe('stack overflow prevention (cyclic schema)', () => {
     // which previously triggered runaway recursion due to redundant traversal logic.
     // Build nested object schema depth N; if validator doesn't guard, may overflow.
     const depth = 400; // large enough to risk stack without protection
-    let current = { name: 'lvl0', type: 'object', children: { required: [] as any[], optional: [] as any[] } } as any;
+    let current = { name: 'lvl0', type: 'object', children: { required: [] as unknown[], optional: [] as unknown[] } };
     const root = current;
     for (let i = 1; i < depth; i++) {
-      const next = { name: `lvl${i}`, type: 'object', children: { required: [] as any[], optional: [] as any[] } };
+      const next = { name: `lvl${i}`, type: 'object', children: { required: [] as unknown[], optional: [] as unknown[] } };
       current.children.required.push(next);
       current = next;
     }

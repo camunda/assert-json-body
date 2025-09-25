@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { validateResponseShape } from '../index.js';
 import { writeFileSync, mkdtempSync, mkdirSync, rmSync } from 'node:fs';

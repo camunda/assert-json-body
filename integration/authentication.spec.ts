@@ -12,6 +12,7 @@ async function httpGetJson(url: string) {
 
 let responsesFilePath: string;
 let workDir: string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let typedValidate: any; // will load from generated index.ts after extraction
 
 describe('integration: /license', () => {
@@ -38,16 +39,17 @@ describe('integration: /license', () => {
 
   afterAll(() => {
     if (workDir) {
+      // eslint-disable-next-line no-empty
       try { rmSync(workDir, { recursive: true, force: true }); } catch {}
     }
   });
 
   it('validates /license against extracted schema', async () => {
     const baseUrl = process.env.TEST_BASE_URL || 'http://localhost:8080/v2';
-    let json: any;
+    let json: unknown;
     try {
       json = await httpGetJson(baseUrl + '/license'); // fetch a route to ensure server is up
-    } catch (e) {
+    } catch {
       console.warn('Server not reachable; start the service or set TEST_BASE_URL to run integration test');
       return; // treat as soft skip
     }

@@ -5,7 +5,7 @@ import { writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { ExtractConfig } from '../types/index.js';
 
 function printVersion() {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const pkg = require('../../package.json');
   console.log(pkg.version);
 }
@@ -71,7 +71,7 @@ async function run() {
     process.exit(1);
   }
   const cfgPath = typeof args.config === 'string' ? String(args.config) : undefined;
-  const resolution = buildConfig(cfgPath);
+  buildConfig(cfgPath);
   const cliOverrides: ExtractConfig = cliConfigSubset(args as Record<string,string|boolean>);
   try {
     await generate(cliOverrides);

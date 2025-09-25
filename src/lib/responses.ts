@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { resolve, isAbsolute, dirname } from 'node:path';
+import { resolve, isAbsolute } from 'node:path';
 import { ResponseEntry, ResponsesFile, RouteContext } from '../types/index.js';
 import { buildConfig } from './config.js';
 
@@ -7,7 +7,7 @@ interface ResolverOptions { responsesFilePath?: string; configPath?: string }
 interface ResolvedPath { path: string; source: 'explicit'|'env'|'config'|'default' }
 
 let cachedConfig: ReturnType<typeof buildConfig> | null = null;
-let responseIndexCache = new Map<string, Map<string, ResponseEntry[]>>();
+const responseIndexCache = new Map<string, Map<string, ResponseEntry[]>>();
 
 function loadConfigOnce(configPath?: string) {
   if (!cachedConfig) { cachedConfig = buildConfig(configPath); }
@@ -65,7 +65,7 @@ export interface PickRouteOptions extends ResolverOptions { method?: string; sta
 
 export function pickRoute(path: string, method?: string, status?: string, _deprecated?: unknown): RouteContext;
 export function pickRoute(path: string, options?: PickRouteOptions): RouteContext;
-export function pickRoute(path: string, a?: any, b?: any, _d?: any): RouteContext {
+export function pickRoute(path: string, a?: PickRouteOptions | string, b?: string, _d?: unknown): RouteContext {
   // Hard break: if second arg is object treat as options, else legacy signature still partially honored this release but will throw if 4th param used.
   let method: string | undefined;
   let status: string | undefined;
@@ -75,7 +75,7 @@ export function pickRoute(path: string, a?: any, b?: any, _d?: any): RouteContex
     method = opts.method;
     status = opts.status;
   } else {
-    method = a;
+    method = a as string;
     status = b;
     if (_d !== undefined) throw new Error('Fourth argument to pickRoute removed; use options object instead.');
   }

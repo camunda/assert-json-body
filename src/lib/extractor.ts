@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import crypto from 'node:crypto';
 import yaml from 'js-yaml';
 import { fileURLToPath } from 'node:url';
+import { OpenAPIV3 } from 'openapi-types';
 import { sparseCheckout } from './git.js';
 import { buildSchemaTree } from './child-expansion.js';
 import { ResponsesFile, ResponseEntry, SchemaGroup, ExtractConfig, ResolvedExtractConfig } from '../types/index.js';
@@ -10,26 +11,35 @@ import { buildConfig } from './config.js';
 
 // Backwards compatibility defaults retained via config module default values
 
-function resolveResponse(resp: any, doc: any): any {
-  if (resp && resp.$ref) { const refName = resp.$ref.split('/').pop(); return doc.components?.responses?.[refName!] || resp; }
+type ResponsesMap = Record<string, OpenAPIV3.ResponseObject | OpenAPIV3.ReferenceObject>;
+type ComponentsLike = { components?: { responses?: ResponsesMap; schemas?: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> } };
+type PathItemLike = OpenAPIV3.PathItemObject;
+type OperationLike = OpenAPIV3.OperationObject;
+
+function isRef(obj: unknown): obj is OpenAPIV3.ReferenceObject {
+  return !!obj && typeof obj === 'object' && '$ref' in (obj as Record<string, unknown>);
+}
+
+function resolveResponse(resp: OpenAPIV3.ResponseObject | OpenAPIV3.ReferenceObject, doc: ComponentsLike): OpenAPIV3.ResponseObject | OpenAPIV3.ReferenceObject {
+  if (isRef(resp)) { const refName = resp.$ref.split('/').pop(); return doc.components?.responses?.[refName!] || resp; }
   return resp;
 }
 
-export function extractResponses(doc: any): ResponseEntry[] {
+export function extractResponses(doc: OpenAPIV3.Document): ResponseEntry[] {
   const entries: ResponseEntry[] = [];
-  const paths = doc.paths || {};
-  for (const [path, pathItem] of Object.entries<any>(paths)) {
-    for (const method of ['get','post','put','patch','delete']) {
-      const op = (pathItem as any)[method];
+  const paths: Record<string, PathItemLike> = (doc.paths || {}) as Record<string, PathItemLike>;
+  for (const [path, pathItem] of Object.entries(paths)) {
+    for (const method of ['get','post','put','patch','delete'] as const) {
+      const op: OperationLike | undefined = (pathItem as Record<string, unknown>)[method] as OperationLike | undefined;
       if (!op) continue;
-      const responses = op.responses || {};
-      for (const [status, response] of Object.entries<any>(responses)) {
+      const responses: ResponsesMap = (op.responses || {}) as ResponsesMap;
+      for (const [status, response] of Object.entries(responses)) {
         const resolved = resolveResponse(response, doc);
-        const content = resolved?.content;
+        const content = (resolved as OpenAPIV3.ResponseObject).content;
         const appJson = content?.['application/json'];
-        const schema = appJson?.schema;
+        const schema = appJson?.schema as (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined);
         if (!schema) continue;
-        const flattened = buildSchemaTree(schema, doc.components?.schemas || {});
+        const flattened = buildSchemaTree(schema, (doc.components?.schemas || {}) as Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject>);
         entries.push({ path, method: method.toUpperCase(), status, schema: { required: flattened.required, optional: flattened.optional } });
       }
     }
@@ -64,7 +74,7 @@ export async function generate(cfg?: ExtractConfig) {
     outputDir: cfg?.outputDir || base.outputDir,
     preserveCheckout: cfg?.preserveCheckout ?? base.preserveCheckout,
     dryRun: cfg?.dryRun ?? base.dryRun,
-    logLevel: (cfg?.logLevel as any) || base.logLevel,
+  logLevel: (cfg?.logLevel as ExtractConfig['logLevel']) || base.logLevel,
     failIfExists: cfg?.failIfExists ?? base.failIfExists,
     responsesFile: cfg?.responsesFile || base.responsesFile,
   };
@@ -72,8 +82,10 @@ export async function generate(cfg?: ExtractConfig) {
   const SPEC_PATH = effective.specPath;
   const { workdir, commit, specContent } = sparseCheckout(REPO, SPEC_PATH, effective.ref);
   try {
-    const doc: any = yaml.load(specContent);
-    const responses = extractResponses(doc);
+  const raw = yaml.load(specContent) as unknown;
+  // We accept partial docs; cast to OpenAPIV3.Document for extraction purposes.
+  const doc = raw as OpenAPIV3.Document;
+  const responses = extractResponses(doc);
     for (const entry of responses) pruneSchema(entry.schema);
     const sha256 = crypto.createHash('sha256').update(specContent).digest('hex');
     const out: ResponsesFile = { metadata: { sourceRepo: REPO, commit, generatedAt: new Date().toISOString(), specPath: SPEC_PATH, specSha256: sha256 }, responses };
@@ -125,7 +137,7 @@ export async function generate(cfg?: ExtractConfig) {
   } finally {
     if (effective.preserveCheckout) {
       if (effective.logLevel === 'debug') console.log('Preserving temporary spec checkout.');
-    } else { try { rmSync(workdir, { recursive: true, force: true }); } catch {} }
+  } else { try { rmSync(workdir, { recursive: true, force: true }); } catch { /* ignore cleanup error */ } }
   }
 }
 

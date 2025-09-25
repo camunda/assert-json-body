@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { writeFileSync, mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';

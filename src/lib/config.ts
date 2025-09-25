@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ExtractConfig, ValidateConfig, ConfigFile, ResolvedExtractConfig, ResolvedValidateConfig, ConfigResolution, ResolvedConfig } from '../types/index.js';
@@ -52,7 +53,7 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): { command?
   return { command, args, positionals };
 }
 
-function pick<T>(obj: Record<string,string|boolean>, keys: string[]): ExtractConfig {
+function pick(obj: Record<string,string|boolean>, keys: string[]): ExtractConfig {
   const out: ExtractConfig = {};
   for (const k of keys) if (k in obj) (out as any)[k] = obj[k];
   return out;
@@ -121,7 +122,7 @@ export function buildConfig(explicitConfigPath?: string): ConfigResolution {
   const warnings: string[] = [];
   const { filePath, file, error } = loadConfigFile(process.cwd(), explicitConfigPath);
   if (error) warnings.push(`Failed to load config file: ${error.message}`);
-  const { command, args } = parseCliArgs();
+  const { args } = parseCliArgs();
   // only parse config impacting args
   const cli = cliConfigSubset(args);
   const env = envConfigSubset();

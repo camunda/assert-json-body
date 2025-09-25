@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { flatten, describeType, primitiveFromSchema } from '../../extractor/src/lib/schema-flatten.js';
 
