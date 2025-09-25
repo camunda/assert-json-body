@@ -23,7 +23,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "assert-json-body": "./dist/cli/index.js"
+    "assert-json-body": "dist/cli/index.js"
   },
   "files": [
     "dist",
