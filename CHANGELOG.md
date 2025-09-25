@@ -1,3 +1,16 @@
+# 1.0.0 (2025-09-25)
+
+
+### Bug Fixes
+
+* remove tsbuildinfo files ([2dd3198](https://github.com/camunda/assert-json-body/commit/2dd3198dee697c3c130614db550582ec72ed8900))
+* update package-lock.json ([d60280f](https://github.com/camunda/assert-json-body/commit/d60280fccd2029a51e53a2263fcc9230a183a5b6))
+
+
+### Features
+
+* extract and validate from a specification ([95bc476](https://github.com/camunda/assert-json-body/commit/95bc4760feafe9bd36a04856eade1513e3a2569f))
+
 # Changelog
 
 All notable changes to this project will be documented by [semantic-release](https://github.com/semantic-release/semantic-release).
