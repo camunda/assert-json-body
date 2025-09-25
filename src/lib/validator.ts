@@ -2,6 +2,9 @@ import {RouteContext, FieldSpec} from '../types/index.js';
 import { pickRoute } from './responses.js';
 import { recordBody } from './recorder.js';
 import { buildConfig } from './config.js';
+import {debug} from 'debug'
+
+const log = debug('validator');
 
 interface ValidationOptions { arraySampleLimit: number }
 
@@ -103,7 +106,7 @@ export interface ValidateOptions { responsesFilePath?: string; configPath?: stri
  * Public API: validateResponseShape(spec, body, options?)
  * Resolves the route context (schema lookup) internally using configuration precedence.
  */
-export interface ValidateResultBase { ok: boolean; errors?: string[]; response: unknown; schema: { required: FieldSpec[]; optional: FieldSpec[] }; routeContext: RouteContext }
+export interface ValidateResultBase { ok: boolean; errors?: string[]; response: unknown; routeContext: RouteContext }
 
 export function validateResponseShape(spec: { path: string; method?: string; status?: string }, body: unknown, options: ValidateOptions = {}): ValidateResultBase {
   const routeCtx = pickRoute(spec.path, {
@@ -124,12 +127,14 @@ export function validateResponseShape(spec: { path: string; method?: string; sta
   }
   try {
     _validateRouteContext(routeCtx, body);
-    return { ok: true, response: body, schema: { required: routeCtx.requiredFields, optional: routeCtx.optionalFields }, routeContext: routeCtx };
+    const validation = { ok: true, response: body, routeContext: routeCtx };
+    log(JSON.stringify(validation, null, 2))
+    return validation;
   } catch (err) {
     if (shouldThrow) throw err;
     const msg = (err as Error).message || '';
     const lines = msg.split('\n');
-    return { ok: false, errors: lines.slice(1).filter(Boolean), response: body, schema: { required: routeCtx.requiredFields, optional: routeCtx.optionalFields }, routeContext: routeCtx };
+    return { ok: false, errors: lines.slice(1).filter(Boolean), response: body, routeContext: routeCtx };
   }
 }
 
