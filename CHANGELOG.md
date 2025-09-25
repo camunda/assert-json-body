@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/camunda/assert-json-body/compare/v1.0.0...v1.0.1) (2025-09-25)
+
+
+### Bug Fixes
+
+* npm pkg fix for publish ([bc30181](https://github.com/camunda/assert-json-body/commit/bc30181e15beb6122d1ec29cf1401b7ff24c3bea))
+
 # 1.0.0 (2025-09-25)
 
 
