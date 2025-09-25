@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "rootDir": "src",
+    "types": ["node"],
+    "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "paths": {
+      "@/types": ["./src/types/index"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/cli/*": ["./src/cli/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "dist",
+    "dist-cjs",
+    "node_modules",
+    "src/**/*.spec.ts",
+    "src/tests/**"
+  ]
+}
