@@ -3,10 +3,11 @@ import yaml from 'js-yaml';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { extractResponses } from '../../lib/extractor.js';
+import { OpenAPIV3 } from 'openapi-types';
 
 describe('discriminator mixed object vs primitive', () => {
   const specPath = join(__dirname, 'fixtures', 'discriminator-mixed.yaml');
-  const doc = yaml.load(readFileSync(specPath, 'utf8'));
+  const doc = yaml.load(readFileSync(specPath, 'utf8')) as OpenAPIV3.Document;
   const responses = extractResponses(doc);
 
   it('extracts 200 response for /job-result', () => {
