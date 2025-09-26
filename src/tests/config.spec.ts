@@ -98,4 +98,12 @@ describe('buildConfig', () => {
 
     expect(resolution.cli).toEqual({});
   });
+
+  it('falls back to default extract config when no overrides present', () => {
+    const resolution = buildConfig();
+    expect(resolution.filePath).toBeUndefined();
+    expect(resolution.warnings).toEqual([]);
+    expect(resolution.resolved.extract.specPath).toBe('specification/rest-api.yaml');
+    expect(resolution.resolved.extract.repo).toBe('https://github.com/camunda/camunda-orchestration-cluster-api');
+  });
 });

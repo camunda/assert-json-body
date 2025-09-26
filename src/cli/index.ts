@@ -23,7 +23,7 @@ function initConfig() {
   const example = {
     extract: {
       repo: 'https://github.com/camunda/camunda-orchestration-cluster-api',
-      specPath: 'specification/openapi.yaml',
+      specPath: 'specification/rest-api.yaml',
       ref: 'main',
       outputDir: 'json-body-assertions',
       preserveCheckout: false,

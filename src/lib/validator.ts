@@ -2,7 +2,7 @@ import {RouteContext, FieldSpec} from '../types/index.js';
 import { pickRoute } from './responses.js';
 import { recordBody } from './recorder.js';
 import { buildConfig } from './config.js';
-import {debug} from 'debug'
+import debug from 'debug'
 
 const log = debug('validator');
 
