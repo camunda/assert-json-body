@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/camunda/assert-json-body/compare/v1.1.0...v1.1.1) (2025-09-26)
+
+
+### Bug Fixes
+
+* change default output dir ([01495f1](https://github.com/camunda/assert-json-body/commit/01495f1478059349388ebfe09380be7a007fde73))
+
 # [1.1.0](https://github.com/camunda/assert-json-body/compare/v1.0.2...v1.1.0) (2025-09-26)
 
 
