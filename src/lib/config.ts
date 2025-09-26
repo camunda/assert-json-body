@@ -67,21 +67,35 @@ export function envConfigSubset(env: NodeJS.ProcessEnv = process.env): { extract
   const map: Record<string,string> = {};
   for (const [k,v] of Object.entries(env)) if (typeof v === 'string') map[k] = v;
   const getBool = (k: string): boolean | undefined => map[k] ? /^(1|true|yes)$/i.test(map[k]) : undefined;
-  const extract: ExtractConfig = {
-    repo: map.AJB_REPO || map.REPO,
-    specPath: map.AJB_SPEC_PATH || map.SPEC_PATH,
-    ref: map.AJB_REF || map.SPEC_REF || map.REF,
-    outputDir: map.AJB_OUTPUT_DIR || map.OUTPUT_DIR,
-    preserveCheckout: getBool('AJB_PRESERVE_CHECKOUT') ?? getBool('PRESERVE_SPEC_CHECKOUT'),
-    dryRun: getBool('AJB_DRY_RUN'),
-    responsesFile: map.AJB_RESPONSES_FILE || map.ROUTE_TEST_RESPONSES_FILE,
-    logLevel: (map.AJB_LOG_LEVEL as any) || undefined,
-    failIfExists: getBool('AJB_FAIL_IF_EXISTS'),
-  };
-  const validate: ValidateConfig = {
-    recordResponses: getBool('AJB_RECORD') ?? getBool('TEST_RESPONSE_BODY_RECORD'),
-    throwOnValidationFail: getBool('AJB_THROW_ON_FAIL'),
-  };
+  const extract: ExtractConfig = {};
+  const repo = map.AJB_REPO ?? map.REPO;
+  if (repo !== undefined) extract.repo = repo;
+  const specPath = map.AJB_SPEC_PATH ?? map.SPEC_PATH;
+  if (specPath !== undefined) extract.specPath = specPath;
+  const ref = map.AJB_REF ?? map.SPEC_REF ?? map.REF;
+  if (ref !== undefined) extract.ref = ref;
+  const outputDir = map.AJB_OUTPUT_DIR ?? map.OUTPUT_DIR;
+  if (outputDir !== undefined) extract.outputDir = outputDir;
+  const preserveCheckout = getBool('AJB_PRESERVE_CHECKOUT');
+  const preserveCheckoutFallback = getBool('PRESERVE_SPEC_CHECKOUT');
+  const preserveCheckoutValue = preserveCheckout ?? preserveCheckoutFallback;
+  if (preserveCheckoutValue !== undefined) extract.preserveCheckout = preserveCheckoutValue;
+  const dryRun = getBool('AJB_DRY_RUN');
+  if (dryRun !== undefined) extract.dryRun = dryRun;
+  const responsesFile = map.AJB_RESPONSES_FILE ?? map.ROUTE_TEST_RESPONSES_FILE;
+  if (responsesFile !== undefined) extract.responsesFile = responsesFile;
+  const logLevel = map.AJB_LOG_LEVEL as ExtractConfig['logLevel'] | undefined;
+  if (logLevel !== undefined) extract.logLevel = logLevel;
+  const failIfExists = getBool('AJB_FAIL_IF_EXISTS');
+  if (failIfExists !== undefined) extract.failIfExists = failIfExists;
+
+  const validate: ValidateConfig = {};
+  const record = getBool('AJB_RECORD');
+  const recordFallback = getBool('TEST_RESPONSE_BODY_RECORD');
+  const recordValue = record ?? recordFallback;
+  if (recordValue !== undefined) validate.recordResponses = recordValue;
+  const throwOnFail = getBool('AJB_THROW_ON_FAIL');
+  if (throwOnFail !== undefined) validate.throwOnValidationFail = throwOnFail;
   return { extract, validate };
 }
 
