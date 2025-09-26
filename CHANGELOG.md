@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/camunda/assert-json-body/compare/v1.1.3...v1.2.0) (2025-09-26)
+
+
+### Features
+
+* add default recording directory ([da5e174](https://github.com/camunda/assert-json-body/commit/da5e174b764cd203e1486ff316c666ec7eaf81f3))
+
 ## [1.1.3](https://github.com/camunda/assert-json-body/compare/v1.1.2...v1.1.3) (2025-09-26)
 
 
