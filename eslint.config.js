@@ -8,7 +8,7 @@ export default [
     ignores: [
       'dist/**',
       'dist-cjs/**',
-      'assert-json-body/**', // generated extraction output
+      'json-body-assertions/**', // generated extraction output
       'node_modules/**'
     ]
   },

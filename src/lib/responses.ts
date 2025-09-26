@@ -30,8 +30,8 @@ function resolveResponsesFile(opts: ResolverOptions = {}): ResolvedPath {
   const cfg = loadConfigOnce(opts.configPath);
   const configured = cfg.resolved.extract.responsesFile || (cfg.resolved.extract.outputDir ? resolve(process.cwd(), cfg.resolved.extract.outputDir, 'responses.json') : undefined);
   if (configured) return { path: configured, source: 'config' };
-  // 4. default (cwd/assert-json-body/responses.json)
-  return { path: resolve(process.cwd(), 'assert-json-body', 'responses.json'), source: 'default' };
+  // 4. default (cwd/json-body-assertions/responses.json)
+  return { path: resolve(process.cwd(), 'json-body-assertions', 'responses.json'), source: 'default' };
 }
 
 function buildIndex(filePath: string): Map<string, ResponseEntry[]> {

@@ -48,11 +48,11 @@ describe('responses schema path precedence', () => {
   });
 
   it('uses explicit over env over config over default', () => {
-    // 1. Default: place default file at ./assert-json-body/responses.json
+  // 1. Default: place default file at ./json-body-assertions/responses.json
     process.chdir(work);
-    // Create assert-json-body/responses.json (new default directory)
-    mkdirSync(join(work, 'assert-json-body'), { recursive: true });
-    writeResponses(join(work, 'assert-json-body'), 'responses.json', routeSpec.path, 'GET', '200');
+    // Create json-body-assertions/responses.json (new default directory)
+    mkdirSync(join(work, 'json-body-assertions'), { recursive: true });
+    writeResponses(join(work, 'json-body-assertions'), 'responses.json', routeSpec.path, 'GET', '200');
 
     // 2. Config: create config pointing to configDir file
     const configFilePath = join(work, 'assert-json-body.config.json');

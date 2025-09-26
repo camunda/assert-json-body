@@ -18,7 +18,7 @@ let typedValidate: any; // will load from generated index.ts after extraction
 describe('integration: /license', () => {
   beforeAll(async () => {
     workDir = mkdtempSync(join(tmpdir(), 'ajb-int-'));
-    const outDir = join(workDir, 'assert-json-body');
+  const outDir = join(workDir, 'json-body-assertions');
     mkdirSync(outDir, { recursive: true });
     // Run extraction with defaults (will use default repo/spec)
     await generate({ outputDir: outDir });

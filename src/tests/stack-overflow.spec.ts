@@ -18,7 +18,7 @@ import { join } from 'node:path';
 describe('stack overflow prevention (cyclic schema)', () => {
   it.skip('does not overflow stack for self-referential object schema (currently fails)', () => {
     const work = mkdtempSync(join(tmpdir(), 'ajb-cycle-'));
-    const outDir = join(work, 'assert-json-body');
+    const outDir = join(work, 'json-body-assertions');
     mkdirSync(outDir, { recursive: true });
 
     // Instead of a literal cycle (cannot serialize to JSON), create very deep nesting

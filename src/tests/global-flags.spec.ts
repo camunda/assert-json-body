@@ -16,7 +16,7 @@ describe('global flags (throw / record)', () => {
   beforeEach(() => {
     prevCwd = process.cwd();
     work = mkdtempSync(join(tmpdir(), 'ajb-flags-'));
-    const out = join(work, 'assert-json-body');
+  const out = join(work, 'json-body-assertions');
     mkdirSync(out, { recursive: true });
     writeResponses(join(out, 'responses.json'));
     process.chdir(work);

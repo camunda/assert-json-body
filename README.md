@@ -27,8 +27,8 @@ npm install assert-json-body
 	 npx assert-json-body extract
 	 ```
 	 This writes (by default):
-	 - `./assert-json-body/responses.json` (schema bundle)
-	 - `./assert-json-body/index.ts` (auto-generated typed wrapper)
+	 - `./json-body-assertions/responses.json` (schema bundle)
+	 - `./json-body-assertions/index.ts` (auto-generated typed wrapper)
 	 or the configured `responsesFile` for the JSON schema artifact.
 
 	 The init step also adds an npm script for convenience:
@@ -56,7 +56,7 @@ npm install assert-json-body
 
 4. Prefer typed validation (after extract):
 	 ```ts
-	 import { validateResponseShape } from './assert-json-body/index';
+	 import { validateResponseShape } from './json-body-assertions/index';
 
 	 // Now path/method/status are constrained to extracted endpoints
 	 validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, jsonBody);
@@ -88,7 +88,7 @@ If you commit the generated files:
 ```
 
 If you prefer not to commit generated artifacts:
-- Add the output directory (default `assert-json-body/`) to `.gitignore`.
+- Add the output directory (default `json-body-assertions/`) to `.gitignore`.
 - Always run `npm run responses:regenerate` before building / testing.
 
 Caching tip: if your spec repo is large, you can cache the sparse checkout directory by keying on the spec ref (commit SHA) to speed up subsequent runs.
@@ -109,7 +109,7 @@ The configuration is now split into two blocks:
 | `repo` | string | `https://github.com/camunda/camunda-orchestration-cluster-api` | Git repository containing the OpenAPI spec | `AJB_REPO`, `REPO` |
 | `specPath` | string | `specification/rest-api.yaml` | Path to OpenAPI spec inside the repo | `AJB_SPEC_PATH`, `SPEC_PATH` |
 | `ref` | string | `main` | Git ref (branch/tag/sha) to checkout | `AJB_REF`, `SPEC_REF`, `REF` |
-| `outputDir` | string | `assert-json-body` | Directory to write `responses.json` + generated `index.ts` | `AJB_OUTPUT_DIR`, `OUTPUT_DIR` |
+| `outputDir` | string | `json-body-assertions` | Directory to write `responses.json` + generated `index.ts` | `AJB_OUTPUT_DIR`, `OUTPUT_DIR` |
 | `preserveCheckout` | boolean | `false` | Keep sparse checkout working copy (debug) | `AJB_PRESERVE_CHECKOUT`, `PRESERVE_SPEC_CHECKOUT` |
 | `dryRun` | boolean | `false` | Parse spec but do not write files | `AJB_DRY_RUN` |
 | `logLevel` | enum | `info` | `silent` `error` `warn` `info` `debug` | `AJB_LOG_LEVEL` |
@@ -136,7 +136,7 @@ Example full config:
 		"repo": "https://github.com/camunda/camunda-orchestration-cluster-api",
 		"specPath": "specification/openapi.yaml",
 		"ref": "main",
-		"outputDir": "assert-json-body",
+		"outputDir": "json-body-assertions",
 		"preserveCheckout": false,
 		"dryRun": false,
 		"logLevel": "info",
@@ -160,7 +160,7 @@ When `validateResponseShape` looks for the schema artifact, precedence is:
 1. Explicit option: `responsesFilePath` passed to the function
 2. Environment variable: `ROUTE_TEST_RESPONSES_FILE` or `AJB_RESPONSES_FILE`
 3. Config file: `extract.responsesFile` or `<outputDir>/responses.json`
-4. Default fallback: `./assert-json-body/responses.json`
+4. Default fallback: `./json-body-assertions/responses.json`
 
 All file issues (missing, unreadable, parse errors, malformed structure) throw clear errors.
 
@@ -217,7 +217,7 @@ if (!r2.ok) {
 ### Generated Typed Entry (after extract)
 After running the extractor you can import a strongly-typed version of `validateResponseShape` that constrains `path`, `method` and `status` to only the extracted endpoints:
 ```ts
-import { validateResponseShape } from './assert-json-body/index';
+import { validateResponseShape } from './json-body-assertions/index';
 
 // Autocomplete + compile-time safety for path/method/status
 validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body);
@@ -227,7 +227,7 @@ validateResponseShape({ path: '/process-instance/create', method: 'POST', status
 ```
 You can also use the exported helper types:
 ```ts
-import type { RoutePath, MethodFor, StatusFor } from './assert-json-body/index';
+import type { RoutePath, MethodFor, StatusFor } from './json-body-assertions/index';
 
 type AnyRoute = RoutePath;
 type GetStatus<P extends RoutePath> = StatusFor<P, MethodFor<P>>;
@@ -251,7 +251,7 @@ The generated `index.ts` only stores a nested map of route/method/status flags, 
 Re-run `npx assert-json-body extract`. The `index.ts` file is regenerated deterministically.
 
 **Do I still need to import from the package root?**  
-Use the package root for generic validation utilities (`validateResponseShape`), and the generated `./assert-json-body/index` for strongly typed validation.
+Use the package root for generic validation utilities (`validateResponseShape`), and the generated `./json-body-assertions/index` for strongly typed validation.
 
 ## Releasing & Versioning
 

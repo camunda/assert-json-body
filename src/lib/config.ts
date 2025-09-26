@@ -9,7 +9,7 @@ const DEFAULT_EXTRACT: ResolvedExtractConfig = {
   repo: 'https://github.com/camunda/camunda-orchestration-cluster-api',
   specPath: 'specification/rest-api.yaml',
   ref: 'main',
-  outputDir: 'assert-json-body',
+  outputDir: 'json-body-assertions',
   preserveCheckout: false,
   dryRun: false,
   logLevel: 'info',

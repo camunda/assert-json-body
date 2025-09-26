@@ -7,7 +7,7 @@ import { join } from 'node:path';
 describe('validateResponseShape return shape', () => {
   it('returns response, schema and routeContext in non-throw mode (success)', () => {
     const work = mkdtempSync(join(tmpdir(), 'ajb-return-'));
-    const outDir = join(work, 'assert-json-body');
+    const outDir = join(work, 'json-body-assertions');
     mkdirSync(outDir, { recursive: true });
     // minimal responses.json
     const responses = { responses: [ { path: '/r', method: 'GET', status: '200', schema: { required: [ { name: 'id', type: 'string' } ], optional: [] } } ] };
@@ -24,7 +24,7 @@ describe('validateResponseShape return shape', () => {
 
   it('returns errors plus response/schema/routeContext in non-throw mode (failure)', () => {
     const work = mkdtempSync(join(tmpdir(), 'ajb-return-'));
-    const outDir = join(work, 'assert-json-body');
+    const outDir = join(work, 'json-body-assertions');
     mkdirSync(outDir, { recursive: true });
     const responses = { responses: [ { path: '/r', method: 'GET', status: '200', schema: { required: [ { name: 'id', type: 'string' } ], optional: [] } } ] };
     writeFileSync(join(outDir, 'responses.json'), JSON.stringify(responses, null, 2));

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { generate } from '../lib/extractor.js';
-import { buildConfig, parseCliArgs, cliConfigSubset } from '../lib/config.js';
+import { parseCliArgs, cliConfigSubset } from '../lib/config.js';
 import { writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { ExtractConfig } from '../types/index.js';
 
@@ -11,7 +11,7 @@ function printVersion() {
 }
 
 function printHelp() {
-  console.log(`assert-json-body <command> [options]\n\nCommands:\n  extract            Run extraction (default)\n  init-config        Create example assert-json-body.config.json\n  help               Show this help\n  version            Print version\n\nExtraction Options (CLI/env override config.extract):\n  --repo=URL\n  --specPath=PATH\n  --ref=REF                 (branch/tag/sha)\n  --outputDir=DIR           (default: assert-json-body)\n  --responsesFile=FILE      (override output file path)\n  --preserveCheckout        (do not delete temp git checkout)\n  --dryRun                  (simulate, no filesystem writes)\n  --failIfExists            (error if responses file exists)\n  --logLevel=VAL            (silent|error|warn|info|debug)\n  --config=FILE             (explicit config file path)\n\nValidation (env overrides only for now):\n  AJB_RECORD / TEST_RESPONSE_BODY_RECORD (enable global recording)\n  AJB_THROW_ON_FAIL (default throw behaviour)\n\nSchema file resolution precedence:\n  explicit option > env (AJB_RESPONSES_FILE / ROUTE_TEST_RESPONSES_FILE) > config.extract.responsesFile or <outputDir>/responses.json > default ./assert-json-body/responses.json\n`);
+  console.log(`assert-json-body <command> [options]\n\nCommands:\n  extract            Run extraction (default)\n  init-config        Create example assert-json-body.config.json\n  help               Show this help\n  version            Print version\n\nExtraction Options (CLI/env override config.extract):\n  --repo=URL\n  --specPath=PATH\n  --ref=REF                 (branch/tag/sha)\n  --outputDir=DIR           (default: json-body-assertions)\n  --responsesFile=FILE      (override output file path)\n  --preserveCheckout        (do not delete temp git checkout)\n  --dryRun                  (simulate, no filesystem writes)\n  --failIfExists            (error if responses file exists)\n  --logLevel=VAL            (silent|error|warn|info|debug)\n  --config=FILE             (explicit config file path)\n\nValidation (env overrides only for now):\n  AJB_RECORD / TEST_RESPONSE_BODY_RECORD (enable global recording)\n  AJB_THROW_ON_FAIL (default throw behaviour)\n\nSchema file resolution precedence:\n  explicit option > env (AJB_RESPONSES_FILE / ROUTE_TEST_RESPONSES_FILE) > config.extract.responsesFile or <outputDir>/responses.json > default ./json-body-assertions/responses.json\n`);
 }
 
 function initConfig() {
@@ -25,7 +25,7 @@ function initConfig() {
       repo: 'https://github.com/camunda/camunda-orchestration-cluster-api',
       specPath: 'specification/openapi.yaml',
       ref: 'main',
-      outputDir: 'assert-json-body',
+      outputDir: 'json-body-assertions',
       preserveCheckout: false,
       dryRun: false,
       logLevel: 'info',
@@ -71,10 +71,9 @@ async function run() {
     process.exit(1);
   }
   const cfgPath = typeof args.config === 'string' ? String(args.config) : undefined;
-  buildConfig(cfgPath);
   const cliOverrides: ExtractConfig = cliConfigSubset(args as Record<string,string|boolean>);
   try {
-    await generate(cliOverrides);
+    await generate(cliOverrides, { configPath: cfgPath });
   } catch (err) {
     console.error('[assert-json-body] extract failed:', err);
     process.exit(1);
