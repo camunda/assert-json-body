@@ -18,7 +18,7 @@ describe('validateResponseShape return shape', () => {
     expect(result).toBeTruthy();
     expect(result!.ok).toBe(true);
     expect(result!.response).toBe(body);
-    expect(result!.schema.required[0].name).toBe('id');
+    expect(result!.routeContext.requiredFields[0].name).toBe('id');
     expect(result!.routeContext.route).toBe('/r');
   });
 
@@ -35,7 +35,7 @@ describe('validateResponseShape return shape', () => {
     expect(result!.ok).toBe(false);
     expect(result!.errors && result!.errors.length).toBeGreaterThan(0);
     expect(result!.response).toBe(body);
-    expect(result!.schema.required[0].name).toBe('id');
+    expect(result!.routeContext.requiredFields[0].name).toBe('id');
     expect(result!.routeContext.method).toBe('GET');
   });
 });

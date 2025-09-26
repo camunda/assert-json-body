@@ -15,7 +15,7 @@ describe('validator positive cases (framework-agnostic)', () => {
   const res = validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body, { throw: false, responsesFilePath: responsesFile });
   expect(res && res.ok).toBe(true);
   expect(res && res.response).toBe(body);
-  expect(res && res.schema.required.find(f => f.name === 'processInstanceKey')).toBeTruthy();
+  expect(res && res.routeContext.requiredFields.find(f => f.name === 'processInstanceKey')).toBeTruthy();
   });
 
   it('validates searchProcessInstances with child array', () => {
