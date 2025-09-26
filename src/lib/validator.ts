@@ -1,6 +1,6 @@
 import {RouteContext, FieldSpec} from '../types/index.js';
 import { pickRoute } from './responses.js';
-import { recordBody } from './recorder.js';
+import { recordBody, resolveRecordDirectory } from './recorder.js';
 import { buildConfig } from './config.js';
 import debug from 'debug'
 
@@ -123,7 +123,8 @@ export function validateResponseShape(spec: { path: string; method?: string; sta
   if (doRecord) {
     let label: string | undefined;
     if (typeof options.record === 'object' && options.record) label = options.record.label;
-    recordBody({ routeCtx, body, label });
+    const recordDir = resolveRecordDirectory({ outputDir: cfg.resolved.extract.outputDir, configPath: options.configPath });
+    recordBody({ routeCtx, body, label, directory: recordDir });
   }
   try {
     _validateRouteContext(routeCtx, body);

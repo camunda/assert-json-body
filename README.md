@@ -127,7 +127,7 @@ Additional env variables:
 
 | Env | Purpose |
 |-----|---------|
-| `TEST_RESPONSE_BODY_RECORD_DIR` | Directory where JSONL body recordings are written when recording is active |
+| `TEST_RESPONSE_BODY_RECORD_DIR` | Override directory for JSONL body recordings (default `<outputDir>/recording`) |
 
 Example full config:
 ```json
@@ -294,13 +294,13 @@ Local commit messages are validated by commitlint + husky (commit-msg hook). If 
 
 Environment variables (selected):
 - `ROUTE_TEST_RESPONSES_FILE` / `AJB_RESPONSES_FILE` – override schema file
-- `TEST_RESPONSE_BODY_RECORD_DIR` – directory to write JSONL body recordings
+- `TEST_RESPONSE_BODY_RECORD_DIR` – override recording directory (default `<outputDir>/recording`)
 - `AJB_RECORD` / `TEST_RESPONSE_BODY_RECORD` – set default recording on (true/1/yes)
 - `AJB_THROW_ON_FAIL` – set default throw behavior (true/false)
 
 ## Recording (Optional)
 
-Set `TEST_RESPONSE_BODY_RECORD_DIR=./recordings` and either:
+By default, recordings are written to `<outputDir>/recording` (e.g. `json-body-assertions/recording`). Set `TEST_RESPONSE_BODY_RECORD_DIR` only if you want a custom location. To record responses, either:
 ```ts
 // Per-call recording
 validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, body, { record: { label: 'GET /foo success' } });

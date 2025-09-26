@@ -1,5 +1,5 @@
 import { pickRoute } from './responses.js';
-import { recordBody } from './recorder.js';
+import { recordBody, resolveRecordDirectory } from './recorder.js';
 import { _validateRouteContext } from './validator.js';
 import { RouteContext } from '../types/index.js';
 
@@ -27,7 +27,8 @@ export function assertResponseShape(spec: AssertionSpec, body: unknown, options:
   if (wantRecord) {
     let label: string | undefined;
     if (typeof options.record === 'object' && options.record) label = options.record.label;
-    recordBody({ routeCtx, body, label });
+    const recordDir = resolveRecordDirectory({ configPath: options.configPath });
+    recordBody({ routeCtx, body, label, directory: recordDir });
   }
   try {
   _validateRouteContext(routeCtx, body);

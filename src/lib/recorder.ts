@@ -1,27 +1,41 @@
 import {appendFileSync, existsSync, mkdirSync} from 'node:fs';
+import {isAbsolute, resolve} from 'node:path';
 import {RouteContext} from '../types/index.js';
+import { buildConfig } from './config.js';
 
-const RECORD_DIR = process.env.TEST_RESPONSE_BODY_RECORD_DIR;
-
-function ensureRecordDir(): void {
-  if (!RECORD_DIR) return;
-  if (!existsSync(RECORD_DIR)) {
-    try { mkdirSync(RECORD_DIR, {recursive: true}); } catch { /* ignore */ }
+function ensureRecordDir(dir: string): void {
+  if (!existsSync(dir)) {
+    try { mkdirSync(dir, {recursive: true}); } catch { /* ignore */ }
   }
+}
+
+function toAbsolute(path: string): string {
+  return isAbsolute(path) ? path : resolve(process.cwd(), path);
+}
+
+export function resolveRecordDirectory(opts: { directory?: string; outputDir?: string; configPath?: string } = {}): string | undefined {
+  if (opts.directory) return toAbsolute(opts.directory);
+  const envDir = process.env.TEST_RESPONSE_BODY_RECORD_DIR;
+  if (envDir) return toAbsolute(envDir);
+  const outputDir = opts.outputDir ?? buildConfig(opts.configPath).resolved.extract.outputDir;
+  if (!outputDir) return undefined;
+  const absoluteOutput = toAbsolute(outputDir);
+  return resolve(absoluteOutput, 'recording');
 }
 
 function sanitizeForFile(name: string): string {
   return name.replace(/^\//, '').replace(/[^A-Za-z0-9._-]+/g, '_');
 }
 
-export function recordBody(opts: { routeCtx: RouteContext; body: unknown; testTitle?: string; label?: string; }): void {
-  if (!RECORD_DIR) return;
+export function recordBody(opts: { routeCtx: RouteContext; body: unknown; testTitle?: string; label?: string; directory?: string; configPath?: string; outputDir?: string; }): void {
+  const recordDir = opts.directory ?? resolveRecordDirectory({ outputDir: opts.outputDir, configPath: opts.configPath });
+  if (!recordDir) return;
   try {
-    ensureRecordDir();
-  const {routeCtx, body} = opts;
-  const testTitle = opts.testTitle || opts.label;
+    ensureRecordDir(recordDir);
+    const {routeCtx, body} = opts;
+    const testTitle = opts.testTitle || opts.label;
     const fileBase = `${(routeCtx.method || 'ANY').toUpperCase()}_${routeCtx.status || 'ANY'}_${sanitizeForFile(routeCtx.route)}`;
-    const file = `${RECORD_DIR}/${fileBase}.jsonl`;
+    const file = `${recordDir}/${fileBase}.jsonl`;
     const present: string[] = [];
     const deepSet = new Set<string>();
     const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
