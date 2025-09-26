@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/camunda/assert-json-body/compare/v1.1.2...v1.1.3) (2025-09-26)
+
+
+### Bug Fixes
+
+* update default spec config ([aa30883](https://github.com/camunda/assert-json-body/commit/aa30883a3b352f6bae6694da9422dde00728caf6))
+
 ## [1.1.2](https://github.com/camunda/assert-json-body/compare/v1.1.1...v1.1.2) (2025-09-26)
 
 
