@@ -7,6 +7,8 @@ const components = {
   WrappedId: { allOf: [ { $ref: '#/components/schemas/SimpleString' }, { minLength: 36, maxLength: 36 } ] },
   Composite: { allOf: [ { properties: { a: { type: 'string' } }, required: ['a'] }, { properties: { b: { $ref: '#/components/schemas/WrappedId' } } } ] },
   Node: { allOf: [ { properties: { value: { type: 'integer', format: 'int32' }, next: { $ref: '#/components/schemas/Node' } }, required: ['value'] } ] },
+  Tag: { type: 'string' },
+  TagSet: { type: 'array', items: { $ref: '#/components/schemas/Tag' } },
 };
 
 describe('describeType', () => {
@@ -18,6 +20,11 @@ describe('describeType', () => {
   it('keeps ref name for object-like', () => {
     const t = describeType({ $ref: '#/components/schemas/Composite' }, components as any);
     expect(t).toBe('Composite');
+  });
+
+  it('resolves array references to array types', () => {
+    const t = describeType({ $ref: '#/components/schemas/TagSet' }, components as any);
+    expect(t).toBe('array<string>');
   });
 });
 

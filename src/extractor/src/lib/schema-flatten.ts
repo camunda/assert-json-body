@@ -72,8 +72,15 @@ export function describeType(schema: SchemaOrRef | undefined, components: Record
     const ref = schema.$ref.split('/').pop()!;
     const target = components[ref];
     if (!target) return ref;
-    const prim = primitiveFromSchema(target, components, [...stack, ref]);
-    return prim ?? ref;
+    if (stack.includes(ref)) return ref;
+    const nextStack = [...stack, ref];
+    const prim = primitiveFromSchema(target, components, nextStack);
+    if (prim) return prim;
+    if (isSchemaObject(target)) {
+      const derived = describeType(target, components, nextStack);
+      if (derived !== 'object') return derived;
+    }
+    return ref;
   }
   if (schema.type === 'array') {
     const items = (schema as OpenAPIV3.ArraySchemaObject).items as SchemaOrRef | undefined;
