@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/camunda/assert-json-body/compare/v1.2.1...v1.2.2) (2025-09-30)
+
+
+### Bug Fixes
+
+* remove explicit unknown ([8a22c14](https://github.com/camunda/assert-json-body/commit/8a22c143dac52615b0df3f852a38563cfa010ad4))
+
 ## [1.2.1](https://github.com/camunda/assert-json-body/compare/v1.2.0...v1.2.1) (2025-09-30)
 
 
