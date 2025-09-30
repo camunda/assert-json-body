@@ -1,5 +1,7 @@
 /* Unified type definitions combining assertion ResponseFieldSpec and extractor FieldSpec */
 
+export { PlaywrightAPIResponse } from '../assertion/playwright-type'
+
 export interface FieldSpec {
   name: string;
   type: string; // normalized display type (primitive | array<...> | object | ref name)

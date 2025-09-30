@@ -3,6 +3,7 @@ import { pickRoute } from './responses.js';
 import { recordBody, resolveRecordDirectory } from './recorder.js';
 import { buildConfig } from './config.js';
 import debug from 'debug'
+import { PlaywrightAPIResponse } from '../assertion/playwright-type.js';
 
 const log = debug('validator');
 
@@ -137,6 +138,14 @@ export function validateResponseShape(spec: { path: string; method?: string; sta
     const lines = msg.split('\n');
     return { ok: false, errors: lines.slice(1).filter(Boolean), response: body, routeContext: routeCtx };
   }
+}
+
+export async function validateResponse(spec: { path: string; method?: string; status?: string }, response: PlaywrightAPIResponse, options: ValidateOptions = {}): Promise<ValidateResultBase> {
+  const body = await response.json();
+  if (spec.status && response.status() !== Number(spec.status)) {
+    throw new Error(`Expected status ${spec.status}, received status ${response.status()}`)
+  }
+  return validateResponseShape(spec, body, options);
 }
 
 export { _validateRouteContext };
