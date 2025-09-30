@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/camunda/assert-json-body/compare/v1.2.3...v1.3.0) (2025-09-30)
+
+
+### Features
+
+* validate Playwright response ([c88f73f](https://github.com/camunda/assert-json-body/commit/c88f73fd2da3f6331b4f2e597e4934c8705304cf))
+
 ## [1.2.3](https://github.com/camunda/assert-json-body/compare/v1.2.2...v1.2.3) (2025-09-30)
 
 
