@@ -1,11 +1,26 @@
-import { validateResponseShape } from '../index.js';
-import { describe, it, expect, beforeAll } from 'vitest';
+import { validateResponseShape, validateResponse } from '../index.js';
+import type { PlaywrightAPIResponse } from '../types/index.js';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { resolve } from 'node:path';
 
 const responsesFile = resolve(process.cwd(), 'src/tests/assertion/__fixtures__/sample-responses.json');
 
 beforeAll(() => {
   // Do not rely on env anymore; use explicit option path so we exercise new resolver precedence.
+});
+
+const makeResponse = (body: unknown, status = 200): PlaywrightAPIResponse => ({
+  json: vi.fn().mockResolvedValue(body),
+  status: vi.fn(() => status),
+  ok: vi.fn(() => status >= 200 && status < 300),
+  statusText: vi.fn(() => 'OK'),
+  headers: vi.fn(() => ({})),
+  headersArray: vi.fn(() => []),
+  text: vi.fn(async () => JSON.stringify(body)),
+  body: vi.fn(async () => Buffer.from(JSON.stringify(body))),
+  dispose: vi.fn(async () => {}),
+  url: vi.fn(() => 'http://localhost/test'),
+  [Symbol.asyncDispose]: vi.fn(async () => {}),
 });
 
 describe('validator positive cases (framework-agnostic)', () => {
@@ -48,5 +63,20 @@ describe('validator negative cases (framework-agnostic)', () => {
   it('fails for undeclared additional properties', () => {
     const body = { processInstanceKey: 1, bpmnProcessId: 'p', version: 1, unexpected: 'extra' };
     expect(() => validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body, { responsesFilePath: responsesFile })).toThrow(/EXTRA/);
+  });
+});
+
+describe('validateResponse helper (Playwright adapter)', () => {
+  it('bridges Playwright response to validateResponseShape', async () => {
+    const body = { processInstanceKey: 321, bpmnProcessId: 'proc', version: 2 };
+    const response = makeResponse(body, 200);
+  const result = await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, response, { throw: false, responsesFilePath: responsesFile });
+    expect(result.ok).toBe(true);
+    expect(response.json).toHaveBeenCalledTimes(1);
+  });
+
+  it('throws when status code mismatch occurs', async () => {
+    const response = makeResponse({ processInstanceKey: 1, bpmnProcessId: 'x', version: 1 }, 500);
+  await expect(validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, response, { responsesFilePath: responsesFile })).rejects.toThrow(/Expected status 200/);
   });
 });

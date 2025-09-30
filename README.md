@@ -46,20 +46,24 @@ npm install assert-json-body
 	 ```
 
 3. Validate in a test (untyped import):
-	 ```ts
-	 import { validateResponseShape } from 'assert-json-body';
+	```ts
+	import { validateResponseShape, validateResponse } from 'assert-json-body';
 
-	 // Suppose you just performed an HTTP request and have jsonBody
-	 validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, jsonBody);
-	 // Throws if JSON shape violates required field presence / type rules.
-	 ```
+	// Suppose you just performed an HTTP request and have jsonBody
+	validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, jsonBody);
+	// Throws if JSON shape violates required field presence / type rules.
+
+	// Playwright convenience helper: consumes APIResponse, checks HTTP status, then validates JSON
+	await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, playwrightResponse);
+	```
 
 4. Prefer typed validation (after extract):
-	 ```ts
-	 import { validateResponseShape } from './json-body-assertions/index';
+	```ts
+	import { validateResponseShape, validateResponse } from './json-body-assertions/index';
 
 	 // Now path/method/status are constrained to extracted endpoints
 	 validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, jsonBody);
+	await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, playwrightResponse);
 
 	 // @ts-expect-error invalid status not in spec
 	 // validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '418' }, jsonBody);
@@ -183,10 +187,6 @@ interface ValidateResultBase {
 	ok: boolean;
 	errors?: string[];          // present when ok === false
 	response: unknown;          // the original response body you passed in
-	schema: {                   // the schema fragment used for validation
-		required: FieldSpec[];
-		optional: FieldSpec[];
-	};
 	routeContext: RouteContext; // resolved route/method/status + flattened field specs
 }
 ```
@@ -196,7 +196,7 @@ Examples:
 // Success (non-throw mode)
 const r1 = validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, body, { throw: false });
 if (!r1.ok) throw new Error('unexpected');
-console.log(r1.schema.required.map(f => f.name));
+console.log(r1.routeContext.requiredFields.map(f => f.name));
 
 // Failure (non-throw mode)
 const r2 = validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, otherBody, { throw: false });
@@ -211,16 +211,29 @@ if (!r2.ok) {
 - `throw?: boolean` – override global throw setting
 - `record?: boolean | { label?: string }` – enable recording for this call
 
+### `validateResponse(spec, playwrightResponse, options?)`
+Playwright-friendly wrapper: reads `await response.json()`, optionally enforces the expected status, then routes through `validateResponseShape`.
+
+```ts
+const apiResponse = await request.post('/process-instance/create', { data: payload });
+await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, apiResponse);
+```
+
+- `spec.status` is required when you need HTTP status enforcement; the helper throws if it does not match `response.status()`.
+- `options` shares the same shape as `validateResponseShape` (file resolution, throw, record, config overrides).
+- Returns the same `ValidateResultBase` promise (use `{ throw:false }` for structured result mode).
+
 ### Types
-`FieldSpec`, `RouteContext`, and other structural types are exported from `@/types`.
+`FieldSpec`, `RouteContext`, `PlaywrightAPIResponse`, and other structural types are exported from `@/types`.
 
 ### Generated Typed Entry (after extract)
-After running the extractor you can import a strongly-typed version of `validateResponseShape` that constrains `path`, `method` and `status` to only the extracted endpoints:
+After running the extractor you can import strongly-typed versions of `validateResponseShape` and `validateResponse` that constrain `path`, `method` and `status` to only the extracted endpoints:
 ```ts
-import { validateResponseShape } from './json-body-assertions/index';
+import { validateResponseShape, validateResponse } from './json-body-assertions/index';
 
 // Autocomplete + compile-time safety for path/method/status
 validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body);
+await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, playwrightResponse);
 
 // @ts-expect-error invalid status for that route will fail type-check
 // validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '418' }, body);

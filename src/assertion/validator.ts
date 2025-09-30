@@ -1,2 +1,2 @@
 // Shim: validator relocated to unified lib implementation
-export { validateResponseShape } from '../lib/validator.js';
+export { validateResponseShape, validateResponse } from '../lib/validator.js';
