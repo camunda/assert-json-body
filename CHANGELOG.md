@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/camunda/assert-json-body/compare/v1.2.2...v1.2.3) (2025-09-30)
+
+
+### Bug Fixes
+
+* correctly handle TagSet ([c1365f0](https://github.com/camunda/assert-json-body/commit/c1365f0d0e8b99fac07d44fe4667d1b5f900d55b))
+
 ## [1.2.2](https://github.com/camunda/assert-json-body/compare/v1.2.1...v1.2.2) (2025-09-30)
 
 
