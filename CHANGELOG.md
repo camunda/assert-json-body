@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/camunda/assert-json-body/compare/v1.2.0...v1.2.1) (2025-09-30)
+
+
+### Bug Fixes
+
+* use single quotes in generated schema ([165f373](https://github.com/camunda/assert-json-body/commit/165f373cb44251eec95794d491870c30e7d84b0e))
+
 # [1.2.0](https://github.com/camunda/assert-json-body/compare/v1.1.3...v1.2.0) (2025-09-26)
 
 
