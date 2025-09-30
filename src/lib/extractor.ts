@@ -121,7 +121,7 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
           `  path: P;\n  method: M;\n  status: S;\n}` + '\n\n' +
           `export function validateResponseShape<P extends RoutePath, M extends MethodFor<P>, S extends StatusFor<P,M>>(spec: { path: P; method: M; status: S }, body: unknown, options?: { responsesFilePath?: string; configPath?: string; throw?: boolean; record?: boolean | { label?: string } }) {\n` +
           `  // Cast to base signature (method/status widened to string) for internal call.\n` +
-          `  const baseFn: unknown = _baseValidateResponseShape;\n` +
+          `  const baseFn = _baseValidateResponseShape;\n` +
       `  if (baseFn === (validateResponseShape as unknown)) {\n` +
       `    throw new Error(
 "Typed validator resolved to itself. Avoid aliasing the package name to the generated typed file. Use a relative import to the generated ./json-body-assertions/index or import from 'assert-json-body/base' for the core API."
