@@ -1,6 +1,6 @@
 {
   "name": "assert-json-body",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "OpenAPI response body extraction and JSON shape assertion toolkit (framework-agnostic)",
   "type": "module",
   "main": "./dist-cjs/index.js",

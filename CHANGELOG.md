@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/camunda/assert-json-body/compare/v1.3.0...v1.3.1) (2025-10-15)
+
+
+### Bug Fixes
+
+* remove default value for validateResponse param ([1563ce2](https://github.com/camunda/assert-json-body/commit/1563ce2d867edb0bfb9625b76397de17cbb8a0ac))
+
 # [1.3.0](https://github.com/camunda/assert-json-body/compare/v1.2.3...v1.3.0) (2025-09-30)
 
 
