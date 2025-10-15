@@ -129,7 +129,7 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
   );\n` +
           `  }\n` +
           `  return baseFn(spec as unknown as { path: string; method?: string; status?: string }, body, options);\n}` + '\n' +
-          `export function validateResponse<P extends RoutePath = RoutePath, M extends MethodFor<P>, S extends StatusFor<P,M>>(spec: { path: P; method: M; status: S }, response: PlaywrightAPIResponse, options?: { responsesFilePath?: string; configPath?: string; throw?: boolean; record?: boolean | { label?: string } }) {\n` +
+          `export function validateResponse<P extends RoutePath, M extends MethodFor<P>, S extends StatusFor<P,M>>(spec: { path: P; method: M; status: S }, response: PlaywrightAPIResponse, options?: { responsesFilePath?: string; configPath?: string; throw?: boolean; record?: boolean | { label?: string } }) {\n` +
           `  return _baseValidateResponse(spec, response, options)\n}`;
         writeFileSync(join(outDir, 'index.ts'), indexSource);
       } catch (e) {
