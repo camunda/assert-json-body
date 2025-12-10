@@ -6,8 +6,8 @@ import { ExtractConfig, ValidateConfig, ConfigFile, ResolvedExtractConfig, Resol
 const CONFIG_FILENAME = 'assert-json-body.config.json';
 
 const DEFAULT_EXTRACT: ResolvedExtractConfig = {
-  repo: 'https://github.com/camunda/camunda-orchestration-cluster-api',
-  specPath: 'specification/rest-api.yaml',
+  repo: 'https://github.com/camunda/camunda',
+  specPath: 'zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml',
   ref: 'main',
   outputDir: 'json-body-assertions',
   preserveCheckout: false,
