@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 
 export function run(cmd: string, args: string[], opts: { inherit?: boolean } = {}) {
   const res = spawnSync(cmd, args, { stdio: opts.inherit ? 'inherit' : 'pipe', encoding: 'utf8' });
@@ -14,7 +14,9 @@ export function sparseCheckout(repo: string, specPath: string, ref = 'main'): { 
   run('git', ['init', workdir]);
   run('git', ['-C', workdir, 'remote', 'add', '-f', 'origin', repo]);
   run('git', ['-C', workdir, 'config', 'core.sparseCheckout', 'true']);
-  writeFileSync(join(workdir, '.git', 'info', 'sparse-checkout'), specPath + '\n');
+  const specDir = dirname(specPath);
+  const pattern = specDir === '.' ? '*' : `${specDir}/`;
+  writeFileSync(join(workdir, '.git', 'info', 'sparse-checkout'), pattern + '\n');
   run('git', ['-C', workdir, 'pull', 'origin', ref]);
   const commit = run('git', ['-C', workdir, 'rev-parse', 'HEAD']).trim();
   const specContent = readFileSync(join(workdir, specPath), 'utf8');

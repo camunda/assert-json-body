@@ -1,7 +1,7 @@
 import { writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import crypto from 'node:crypto';
-import yaml from 'js-yaml';
+import SwaggerParser from '@apidevtools/swagger-parser';
 import { fileURLToPath } from 'node:url';
 import { OpenAPIV3 } from 'openapi-types';
 import { sparseCheckout } from './git.js';
@@ -86,14 +86,13 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
   };
   const REPO = effective.repo;
   const SPEC_PATH = effective.specPath;
-  const { workdir, commit, specContent } = sparseCheckout(REPO, SPEC_PATH, effective.ref);
+  const { workdir, commit } = sparseCheckout(REPO, SPEC_PATH, effective.ref);
   try {
-  const raw = yaml.load(specContent) as unknown;
-  // We accept partial docs; cast to OpenAPIV3.Document for extraction purposes.
-  const doc = raw as OpenAPIV3.Document;
-  const responses = extractResponses(doc);
+    const fullPath = join(workdir, SPEC_PATH);
+    const doc = await SwaggerParser.bundle(fullPath) as OpenAPIV3.Document;
+    const responses = extractResponses(doc);
     for (const entry of responses) pruneSchema(entry.schema);
-    const sha256 = crypto.createHash('sha256').update(specContent).digest('hex');
+    const sha256 = crypto.createHash('sha256').update(JSON.stringify(doc)).digest('hex');
     const out: ResponsesFile = { metadata: { sourceRepo: REPO, commit, generatedAt: new Date().toISOString(), specPath: SPEC_PATH, specSha256: sha256 }, responses };
   const outDir = effective.outputDir;
   const targetFile = effective.responsesFile ? resolve(effective.responsesFile) : join(outDir, 'responses.json');

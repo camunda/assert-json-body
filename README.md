@@ -266,6 +266,9 @@ Re-run `npx assert-json-body extract`. The `index.ts` file is regenerated determ
 **Do I still need to import from the package root?**  
 Use the package root for generic validation utilities (`validateResponseShape`), and the generated `./json-body-assertions/index` for strongly typed validation.
 
+**Does it support multi-file OpenAPI specs?**  
+Yes. The extractor automatically bundles referenced files (via `$ref`) as long as they are within the same directory structure as the entry file.
+
 ## Releasing & Versioning
 
 This project uses [semantic-release](https://semantic-release.gitbook.io/) with Conventional Commits to automate:
