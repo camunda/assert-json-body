@@ -103,7 +103,7 @@ describe('buildConfig', () => {
     const resolution = buildConfig();
     expect(resolution.filePath).toBeUndefined();
     expect(resolution.warnings).toEqual([]);
-    expect(resolution.resolved.extract.specPath).toBe('specification/rest-api.yaml');
-    expect(resolution.resolved.extract.repo).toBe('https://github.com/camunda/camunda-orchestration-cluster-api');
+    expect(resolution.resolved.extract.specPath).toBe('zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml');
+    expect(resolution.resolved.extract.repo).toBe('https://github.com/camunda/camunda');
   });
 });
