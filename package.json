@@ -96,7 +96,8 @@
     "vitest": "^2.0.5"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "release": {
     "branches": [
