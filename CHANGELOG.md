@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/camunda/assert-json-body/compare/v1.4.0...v1.5.0) (2025-12-19)
+
+
+### Features
+
+* support multipart spec ([370c9c3](https://github.com/camunda/assert-json-body/commit/370c9c3c632ade73adac087ae9903d9253eef5f5))
+
 # [1.4.0](https://github.com/camunda/assert-json-body/compare/v1.3.1...v1.4.0) (2025-12-19)
 
 
