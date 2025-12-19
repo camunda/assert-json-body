@@ -86,6 +86,9 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
   };
   const REPO = effective.repo;
   const SPEC_PATH = effective.specPath;
+  if (effective.logLevel == 'info') {
+    console.info(effective)
+  }
   const { workdir, commit } = sparseCheckout(REPO, SPEC_PATH, effective.ref);
   try {
     const fullPath = join(workdir, SPEC_PATH);
