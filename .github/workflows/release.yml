@@ -9,7 +9,6 @@ permissions:
   contents: write
   issues: write
   pull-requests: write
-  packages: write
   id-token: write
 
 jobs:
@@ -20,9 +19,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Remove .npmrc
-        run: rm -f .npmrc
 
       - name: Setup Node
         uses: actions/setup-node@v4
