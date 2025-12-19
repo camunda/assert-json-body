@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/camunda/assert-json-body/compare/v1.3.1...v1.4.0) (2025-12-19)
+
+
+### Bug Fixes
+
+* do shallow checkout ([eaf3758](https://github.com/camunda/assert-json-body/commit/eaf3758d08f1de4e3adc3441ccc45f0a515bbe30))
+* update default spec path ([c9d6857](https://github.com/camunda/assert-json-body/commit/c9d6857936ec4c6e86852ea0f1aca00d1641fec7))
+
+
+### Features
+
+* support multi-part spec files ([738d518](https://github.com/camunda/assert-json-body/commit/738d5186ab388e6fcf5f4f3c89076e8e7fb3d468))
+
 ## [1.3.1](https://github.com/camunda/assert-json-body/compare/v1.3.0...v1.3.1) (2025-10-15)
 
 
