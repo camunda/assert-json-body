@@ -125,6 +125,11 @@
         }
       ],
       "@semantic-release/github"
+    ],
+    "verifyConditions": [
+      "@semantic-release/changelog",
+      "@semantic-release/git",
+      "@semantic-release/github"
     ]
   }
 }
