@@ -80,7 +80,7 @@
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^10.0.6",
-    "@semantic-release/npm": "^11.0.2",
+    "@semantic-release/npm": "^13.0.2",
     "@semantic-release/release-notes-generator": "^14.0.0",
     "@types/debug": "^4.1.12",
     "@types/js-yaml": "^4.0.9",
@@ -97,7 +97,8 @@
   },
   "publishConfig": {
     "access": "public",
-    "provenance": true
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
   },
   "release": {
     "branches": [
