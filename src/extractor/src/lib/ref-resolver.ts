@@ -4,6 +4,7 @@ import { SchemaOrRef } from './schema-flatten.js';
 export function resolveRef(ref: string, components: Record<string, SchemaOrRef>, doc?: OpenAPIV3.Document): SchemaOrRef | undefined {
   if (doc && ref.startsWith('#/')) {
      const path = ref.substring(2).split('/');
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
      let current: any = doc;
      for (let i = 0; i < path.length; i++) {
         const seg = path[i];
