@@ -1,3 +1,12 @@
+## [1.5.1](https://github.com/camunda/assert-json-body/compare/v1.5.0...v1.5.1) (2026-01-12)
+
+
+### Bug Fixes
+
+* correctly expand child schemas ([4cadf8f](https://github.com/camunda/assert-json-body/commit/4cadf8fdc63d87060d21c2e10df3c5f3e3921e86))
+* fix lint error ([0a89cc9](https://github.com/camunda/assert-json-body/commit/0a89cc9a7c5d434d41ee9a69fb7fd23d3c7db6dc))
+* fix tests ([756f940](https://github.com/camunda/assert-json-body/commit/756f9406733554e3fa8ec78ec0d02ac5873e96cd))
+
 # [1.5.0](https://github.com/camunda/assert-json-body/compare/v1.4.0...v1.5.0) (2025-12-19)
 
 
