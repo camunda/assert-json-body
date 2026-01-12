@@ -13,17 +13,17 @@ const components = {
 
 describe('describeType', () => {
   it('resolves primitive wrapper to primitive', () => {
-    const t = describeType({ $ref: '#/components/schemas/WrappedId' }, components as any);
+    const t = describeType({ $ref: '#/components/schemas/WrappedId' }, { components: components as any });
     expect(t).toBe('string');
   });
 
   it('keeps ref name for object-like', () => {
-    const t = describeType({ $ref: '#/components/schemas/Composite' }, components as any);
+    const t = describeType({ $ref: '#/components/schemas/Composite' }, { components: components as any });
     expect(t).toBe('Composite');
   });
 
   it('resolves array references to array types', () => {
-    const t = describeType({ $ref: '#/components/schemas/TagSet' }, components as any);
+    const t = describeType({ $ref: '#/components/schemas/TagSet' }, { components: components as any });
     expect(t).toBe('array<string>');
   });
 });
@@ -47,7 +47,7 @@ describe('flatten', () => {
 
 describe('primitiveFromSchema', () => {
   it('returns primitive for wrapped id', () => {
-    const p = primitiveFromSchema({ $ref: '#/components/schemas/WrappedId' }, components as any, []);
+    const p = primitiveFromSchema({ $ref: '#/components/schemas/WrappedId' }, { components: components as any }, []);
     expect(p).toBe('string');
   });
 });
