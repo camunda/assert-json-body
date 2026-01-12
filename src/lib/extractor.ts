@@ -45,7 +45,12 @@ export function extractResponses(doc: OpenAPIV3.Document): ResponseEntry[] {
         const appJson = content?.['application/json'];
         const schema = appJson?.schema as (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject | undefined);
         if (!schema) continue;
-        const flattened = buildSchemaTree(schema, (doc.components?.schemas || {}) as Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject>);
+        const flattened = buildSchemaTree(
+          schema,
+          (doc.components?.schemas || {}) as Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject>,
+          undefined,
+          doc
+        );
         entries.push({ path, method: method.toUpperCase(), status, schema: { required: flattened.required, optional: flattened.optional } });
       }
     }
@@ -93,6 +98,7 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
   try {
     const fullPath = join(workdir, SPEC_PATH);
     const doc = await SwaggerParser.bundle(fullPath) as OpenAPIV3.Document;
+    
     const responses = extractResponses(doc);
     for (const entry of responses) pruneSchema(entry.schema);
     const sha256 = crypto.createHash('sha256').update(JSON.stringify(doc)).digest('hex');
