@@ -22,8 +22,8 @@ function initConfig() {
   }
   const example = {
     extract: {
-      repo: 'https://github.com/camunda/camunda-orchestration-cluster-api',
-      specPath: 'specification/rest-api.yaml',
+      repo: 'https://github.com/camunda/camunda',
+      specPath: 'zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml',
       ref: 'main',
       outputDir: 'json-body-assertions',
       preserveCheckout: false,

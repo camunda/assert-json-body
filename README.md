@@ -110,8 +110,8 @@ The configuration is now split into two blocks:
 
 | Field | Type | Default | Description | Env override(s) |
 |-------|------|---------|-------------|-----------------|
-| `repo` | string | `https://github.com/camunda/camunda-orchestration-cluster-api` | Git repository containing the OpenAPI spec | `AJB_REPO`, `REPO` |
-| `specPath` | string | `specification/rest-api.yaml` | Path to OpenAPI spec inside the repo | `AJB_SPEC_PATH`, `SPEC_PATH` |
+| `repo` | string | `https://github.com/camunda/camunda` | Git repository containing the OpenAPI spec | `AJB_REPO`, `REPO` |
+| `specPath` | string | `zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml` | Path to OpenAPI spec inside the repo | `AJB_SPEC_PATH`, `SPEC_PATH` |
 | `ref` | string | `main` | Git ref (branch/tag/sha) to checkout | `AJB_REF`, `SPEC_REF`, `REF` |
 | `outputDir` | string | `json-body-assertions` | Directory to write `responses.json` + generated `index.ts` | `AJB_OUTPUT_DIR`, `OUTPUT_DIR` |
 | `preserveCheckout` | boolean | `false` | Keep sparse checkout working copy (debug) | `AJB_PRESERVE_CHECKOUT`, `PRESERVE_SPEC_CHECKOUT` |
@@ -137,8 +137,8 @@ Example full config:
 ```json
 {
 	"extract": {
-		"repo": "https://github.com/camunda/camunda-orchestration-cluster-api",
-		"specPath": "specification/rest-api.yaml",
+		"repo": "https://github.com/camunda/camunda",
+		"specPath": "zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml",
 		"ref": "main",
 		"outputDir": "json-body-assertions",
 		"preserveCheckout": false,
@@ -222,6 +222,20 @@ await validateResponse({ path: '/process-instance/create', method: 'POST', statu
 - `spec.status` is required when you need HTTP status enforcement; the helper throws if it does not match `response.status()`.
 - `options` shares the same shape as `validateResponseShape` (file resolution, throw, record, config overrides).
 - Returns the same `ValidateResultBase` promise (use `{ throw:false }` for structured result mode).
+
+### Nullable Fields
+
+The validator respects the OpenAPI `nullable: true` property. When a field in the spec is marked `nullable`, `null` values pass validation without error. When `nullable` is absent or `false`, a `null` value produces a `[TYPE]` error:
+
+```
+[TYPE] /label expected string but got null
+```
+
+The `nullable` flag is extracted automatically during `assert-json-body extract` and stored in `responses.json`. You can also set it manually in a custom responses file:
+
+```json
+{"name": "label", "type": "string", "nullable": true}
+```
 
 ### Types
 `FieldSpec`, `RouteContext`, `PlaywrightAPIResponse`, and other structural types are exported from `@/types`.
