@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/camunda/assert-json-body/compare/v1.6.0...v1.6.1) (2026-02-19)
+
+
+### Bug Fixes
+
+* update README and example config ([e5b8c7e](https://github.com/camunda/assert-json-body/commit/e5b8c7ef037a35bdb3a236eb46ad6a4c83ffff69))
+
 # [1.6.0](https://github.com/camunda/assert-json-body/compare/v1.5.1...v1.6.0) (2026-02-19)
 
 
