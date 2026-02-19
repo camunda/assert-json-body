@@ -158,6 +158,7 @@ export function deriveFieldMetadata(schema: SchemaOrRef, ctx: Context): Partial<
     if (wrapper && underlying) meta.underlyingPrimitive = underlying;
     meta.rawRefName = refKey.split('/').pop()!;
     if (wrapper) meta.wrapper = true;
+    if (isSchemaObject(target) && (target as OpenAPIV3.SchemaObject).nullable) meta.nullable = true;
     return meta;
   }
   if (schema.allOf) {
@@ -166,6 +167,7 @@ export function deriveFieldMetadata(schema: SchemaOrRef, ctx: Context): Partial<
   } else if (isSchemaObject(schema) && schema.enum) {
     meta.enumValues = schema.enum.map((v: unknown) => String(v));
   }
+  if (isSchemaObject(schema) && (schema as OpenAPIV3.SchemaObject).nullable) meta.nullable = true;
   return meta;
 }
 

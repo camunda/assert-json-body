@@ -48,7 +48,7 @@ function _validateRouteContext(routeCtx: RouteContext, body: unknown) {
       const exists = spec.name in obj;
       if (!exists) { if (mode === 'required') { errors.push(`[MISSING] ${fieldPath} expected ${toExpectedDescriptor(spec)}`); } continue; }
       const value = (obj as Record<string, unknown>)[spec.name];
-      if (value === null) { errors.push(`[TYPE] ${fieldPath} expected ${toExpectedDescriptor(spec)} but got null`); continue; }
+      if (value === null) { if (!spec.nullable) { errors.push(`[TYPE] ${fieldPath} expected ${toExpectedDescriptor(spec)} but got null`); } continue; }
       const inner = extractArrayInner(spec.type);
       if (inner) {
         if (!Array.isArray(value)) { errors.push(`[TYPE] ${fieldPath} expected array<${inner}> but got ${actualDescriptor(value)}`); }

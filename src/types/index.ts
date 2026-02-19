@@ -10,6 +10,7 @@ export interface FieldSpec {
   underlyingPrimitive?: string; // underlying primitive if wrapper
   rawRefName?: string; // original $ref name
   wrapper?: boolean; // true if a named wrapper schema over a primitive
+  nullable?: boolean; // true when the OpenAPI schema declares nullable: true
 }
 
 export interface SchemaGroup { required: FieldSpec[]; optional: FieldSpec[] }

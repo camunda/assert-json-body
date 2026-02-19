@@ -47,6 +47,22 @@
           {"name": "extra", "type": "object", "children": {"required": [{"name": "flag", "type": "boolean"}], "optional": []}}
         ]
       }
+    },
+    {
+      "path": "/nullable/fields",
+      "method": "GET",
+      "status": "200",
+      "schema": {
+        "required": [
+          {"name": "id", "type": "string"},
+          {"name": "label", "type": "string", "nullable": true},
+          {"name": "count", "type": "number", "nullable": true}
+        ],
+        "optional": [
+          {"name": "description", "type": "string", "nullable": true},
+          {"name": "status", "type": "string"}
+        ]
+      }
     }
   ]
 }

@@ -80,3 +80,50 @@ describe('validateResponse helper (Playwright adapter)', () => {
   await expect(validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, response, { responsesFilePath: responsesFile })).rejects.toThrow(/Expected status 200/);
   });
 });
+
+describe('nullable field support', () => {
+  it('allows null for required field marked nullable', () => {
+    const body = { id: 'abc', label: null, count: 5 };
+    expect(() => validateResponseShape(
+      { path: '/nullable/fields', method: 'GET', status: '200' },
+      body,
+      { responsesFilePath: responsesFile },
+    )).not.toThrow();
+  });
+
+  it('allows null for optional field marked nullable', () => {
+    const body = { id: 'abc', label: 'hi', count: 5, description: null };
+    expect(() => validateResponseShape(
+      { path: '/nullable/fields', method: 'GET', status: '200' },
+      body,
+      { responsesFilePath: responsesFile },
+    )).not.toThrow();
+  });
+
+  it('rejects null for required field NOT marked nullable', () => {
+    const body = { id: null, label: 'hi', count: 5 };
+    expect(() => validateResponseShape(
+      { path: '/nullable/fields', method: 'GET', status: '200' },
+      body,
+      { responsesFilePath: responsesFile },
+    )).toThrow(/id.*expected.*string.*but got null/i);
+  });
+
+  it('rejects null for optional field NOT marked nullable', () => {
+    const body = { id: 'abc', label: 'hi', count: 5, status: null };
+    expect(() => validateResponseShape(
+      { path: '/nullable/fields', method: 'GET', status: '200' },
+      body,
+      { responsesFilePath: responsesFile },
+    )).toThrow(/status.*expected.*string.*but got null/i);
+  });
+
+  it('allows multiple nullable fields to be null simultaneously', () => {
+    const body = { id: 'abc', label: null, count: null };
+    expect(() => validateResponseShape(
+      { path: '/nullable/fields', method: 'GET', status: '200' },
+      body,
+      { responsesFilePath: responsesFile },
+    )).not.toThrow();
+  });
+});
