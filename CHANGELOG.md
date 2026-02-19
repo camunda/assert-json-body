@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/camunda/assert-json-body/compare/v1.5.1...v1.6.0) (2026-02-19)
+
+
+### Features
+
+* parse nullable fields from spec ([b9b424b](https://github.com/camunda/assert-json-body/commit/b9b424ba324f621fa3ea3e8bdb883bf0714965f3))
+
 ## [1.5.1](https://github.com/camunda/assert-json-body/compare/v1.5.0...v1.5.1) (2026-01-12)
 
 
