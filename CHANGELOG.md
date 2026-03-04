@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/camunda/assert-json-body/compare/v1.6.1...v1.6.2) (2026-03-04)
+
+
+### Bug Fixes
+
+* correctly parse schema with no required ([08ce4af](https://github.com/camunda/assert-json-body/commit/08ce4affbf970c4b13bbcaa6e057d0562a48e84e))
+
 ## [1.6.1](https://github.com/camunda/assert-json-body/compare/v1.6.0...v1.6.1) (2026-02-19)
 
 
