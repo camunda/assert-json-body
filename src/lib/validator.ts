@@ -18,7 +18,7 @@ const toExpectedDescriptor = (spec: FieldSpec): string => { const inner = extrac
 const actualDescriptor = (val: unknown): string => { if (val === null) return 'null'; if (Array.isArray(val)) return 'array'; return typeof val; };
 
 function _validateRouteContext(routeCtx: RouteContext, body: unknown) {
-  if (!routeCtx.route || routeCtx.requiredFields.length === 0) return; // no spec
+  if (!routeCtx.route || (routeCtx.requiredFields.length === 0 && routeCtx.optionalFields.length === 0)) return; // no spec
   if (body === null || typeof body !== 'object' || Array.isArray(body)) {
     throw new Error(`Expected object response body to validate route required fields for ${routeCtx.route}`);
   }
