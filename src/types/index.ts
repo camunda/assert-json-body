@@ -61,6 +61,7 @@ export interface ExtractConfig {
   responsesFile?: string; // advanced override
   logLevel?: 'silent' | 'error' | 'warn' | 'info' | 'debug';
   failIfExists?: boolean;
+  specFile?: string; // local spec file path (skips git checkout)
 }
 
 /** Validation behaviour configuration options */
@@ -82,6 +83,7 @@ export interface ConfigFile {
 export interface ResolvedExtractConfig extends Required<Pick<ExtractConfig,
   'repo' | 'specPath' | 'ref' | 'outputDir' | 'preserveCheckout' | 'dryRun' | 'logLevel' | 'failIfExists'>> {
   responsesFile?: string;
+  specFile?: string;
 }
 
 export type ResolvedValidateConfig = Required<Pick<ValidateConfig,

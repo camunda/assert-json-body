@@ -9,6 +9,7 @@ const ENV_KEYS = [
   'REPO',
   'AJB_SPEC_PATH',
   'SPEC_PATH',
+  'AJB_SPEC_FILE',
   'AJB_REF',
   'SPEC_REF',
   'REF',

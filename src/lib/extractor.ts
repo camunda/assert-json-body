@@ -88,15 +88,37 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
   logLevel: (cfg?.logLevel as ExtractConfig['logLevel']) || base.logLevel,
     failIfExists: cfg?.failIfExists ?? base.failIfExists,
     responsesFile: cfg?.responsesFile || base.responsesFile,
+    specFile: cfg?.specFile || base.specFile,
   };
   const REPO = effective.repo;
   const SPEC_PATH = effective.specPath;
   if (effective.logLevel == 'info') {
     console.info(effective)
   }
-  const { workdir, commit } = sparseCheckout(REPO, SPEC_PATH, effective.ref);
+
+  // When specFile is provided, use the local file directly (skip git checkout)
+  const useLocalSpec = !!effective.specFile;
+  let workdir: string | undefined;
+  let commit: string;
+  let fullPath: string;
+
+  if (useLocalSpec) {
+    fullPath = resolve(effective.specFile!);
+    if (!existsSync(fullPath)) {
+      throw new Error(`Local spec file not found: ${fullPath}`);
+    }
+    commit = 'local';
+    if (effective.logLevel !== 'silent') {
+      console.log(`Using local spec file: ${fullPath}`);
+    }
+  } else {
+    const checkout = sparseCheckout(REPO, SPEC_PATH, effective.ref);
+    workdir = checkout.workdir;
+    commit = checkout.commit;
+    fullPath = join(workdir, SPEC_PATH);
+  }
+
   try {
-    const fullPath = join(workdir, SPEC_PATH);
     const doc = await SwaggerParser.bundle(fullPath) as OpenAPIV3.Document;
     
     const responses = extractResponses(doc);
@@ -152,9 +174,11 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
       if (resolution.warnings.length) { for (const w of resolution.warnings) console.warn(`[config] ${w}`); }
     }
   } finally {
-    if (effective.preserveCheckout) {
-      if (effective.logLevel === 'debug') console.log('Preserving temporary spec checkout.');
-  } else { try { rmSync(workdir, { recursive: true, force: true }); } catch { /* ignore cleanup error */ } }
+    if (workdir) {
+      if (effective.preserveCheckout) {
+        if (effective.logLevel === 'debug') console.log('Preserving temporary spec checkout.');
+      } else { try { rmSync(workdir, { recursive: true, force: true }); } catch { /* ignore cleanup error */ } }
+    }
   }
 }
 

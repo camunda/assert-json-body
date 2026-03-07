@@ -1,0 +1,8 @@
+{
+  "nodeModulesDir": "manual",
+  "unstable": ["sloppy-imports"],
+  "compilerOptions": {
+    "lib": ["deno.ns", "deno.window"],
+    "strict": true
+  }
+}

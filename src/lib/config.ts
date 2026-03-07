@@ -60,7 +60,7 @@ function pick(obj: Record<string,string|boolean>, keys: string[]): ExtractConfig
 }
 
 export function cliConfigSubset(raw: Record<string,string|boolean>): ExtractConfig {
-  return pick(raw, ['repo','specPath','ref','outputDir','preserveCheckout','dryRun','responsesFile','logLevel','failIfExists']);
+  return pick(raw, ['repo','specPath','ref','outputDir','preserveCheckout','dryRun','responsesFile','logLevel','failIfExists','specFile']);
 }
 
 export function envConfigSubset(env: NodeJS.ProcessEnv = process.env): { extract: ExtractConfig; validate: ValidateConfig } {
@@ -88,6 +88,8 @@ export function envConfigSubset(env: NodeJS.ProcessEnv = process.env): { extract
   if (logLevel !== undefined) extract.logLevel = logLevel;
   const failIfExists = getBool('AJB_FAIL_IF_EXISTS');
   if (failIfExists !== undefined) extract.failIfExists = failIfExists;
+  const specFile = map.AJB_SPEC_FILE;
+  if (specFile !== undefined) extract.specFile = specFile;
 
   const validate: ValidateConfig = {};
   const record = getBool('AJB_RECORD');
@@ -124,6 +126,7 @@ export function resolveConfig(parts: { file?: ConfigFile; cli: ExtractConfig; en
     logLevel: (mergedExtract.logLevel as any) || DEFAULT_EXTRACT.logLevel,
     failIfExists: mergedExtract.failIfExists ?? DEFAULT_EXTRACT.failIfExists,
     responsesFile: mergedExtract.responsesFile,
+    specFile: mergedExtract.specFile,
   };
   const validate: ResolvedValidateConfig = {
     recordResponses: mergedValidate.recordResponses ?? DEFAULT_VALIDATE.recordResponses,

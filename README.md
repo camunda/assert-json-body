@@ -97,6 +97,68 @@ If you prefer not to commit generated artifacts:
 
 Caching tip: if your spec repo is large, you can cache the sparse checkout directory by keying on the spec ref (commit SHA) to speed up subsequent runs.
 
+### Standalone Binary (no Node.js required)
+
+Pre-built standalone binaries are attached to each [GitHub release](https://github.com/camunda/assert-json-body/releases). These are self-contained executables compiled with Deno — no Node.js or npm installation needed.
+
+Available platforms:
+- `x86_64-unknown-linux-gnu` / `aarch64-unknown-linux-gnu`
+- `x86_64-apple-darwin` / `aarch64-apple-darwin`
+- `x86_64-pc-windows-msvc`
+
+Usage in CI (e.g. GitHub Actions):
+```yaml
+- name: Download assert-json-body
+  run: |
+    curl -fsSL -o assert-json-body \
+      "https://github.com/camunda/assert-json-body/releases/latest/download/assert-json-body-x86_64-unknown-linux-gnu"
+    chmod +x assert-json-body
+
+- name: Regenerate response schemas
+  run: ./assert-json-body extract
+  env:
+    AJB_REF: ${{ github.event.inputs.spec_ref || 'main' }}
+```
+
+To build locally (requires Deno ≥ 2.x):
+```bash
+npm run build:deno          # local platform
+npm run build:deno:cross    # all platforms
+```
+
+#### Using the binary with a local spec file (e.g. `camunda/camunda` CI)
+
+When the OpenAPI spec is already available on disk — for example, in a workflow that checks out the `camunda/camunda` repository — you can skip the git sparse-checkout entirely by pointing at the local file with `AJB_SPEC_FILE`:
+
+```yaml
+name: Regenerate API response schemas
+on:
+  pull_request:
+    paths:
+      - 'zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml'
+
+jobs:
+  regenerate-schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout camunda/camunda
+        uses: actions/checkout@v4
+
+      - name: Download assert-json-body
+        run: |
+          curl -fsSL -o assert-json-body \
+            "https://github.com/camunda/assert-json-body/releases/latest/download/assert-json-body-x86_64-unknown-linux-gnu"
+          chmod +x assert-json-body
+
+      - name: Regenerate response schemas
+        run: ./assert-json-body extract
+        env:
+          AJB_SPEC_FILE: zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml
+          AJB_OUTPUT_DIR: my-project/json-body-assertions
+```
+
+When `specFile` (or `AJB_SPEC_FILE`) is set, the `repo`, `specPath`, `ref`, and `preserveCheckout` options are ignored — no git operations are performed. The generated `responses.json` metadata will show `commit: "local"` instead of a SHA.
+
 ## Configuration
 
 Config file: `assert-json-body.config.json` (created with `npx assert-json-body config:init`).
@@ -112,6 +174,7 @@ The configuration is now split into two blocks:
 |-------|------|---------|-------------|-----------------|
 | `repo` | string | `https://github.com/camunda/camunda` | Git repository containing the OpenAPI spec | `AJB_REPO`, `REPO` |
 | `specPath` | string | `zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml` | Path to OpenAPI spec inside the repo | `AJB_SPEC_PATH`, `SPEC_PATH` |
+| `specFile` | string | — | Local spec file path (skips git checkout entirely) | `AJB_SPEC_FILE` |
 | `ref` | string | `main` | Git ref (branch/tag/sha) to checkout | `AJB_REF`, `SPEC_REF`, `REF` |
 | `outputDir` | string | `json-body-assertions` | Directory to write `responses.json` + generated `index.ts` | `AJB_OUTPUT_DIR`, `OUTPUT_DIR` |
 | `preserveCheckout` | boolean | `false` | Keep sparse checkout working copy (debug) | `AJB_PRESERVE_CHECKOUT`, `PRESERVE_SPEC_CHECKOUT` |

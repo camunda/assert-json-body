@@ -2,16 +2,36 @@
 import { generate } from '../lib/extractor.js';
 import { parseCliArgs, cliConfigSubset } from '../lib/config.js';
 import { writeFileSync, existsSync, readFileSync } from 'node:fs';
+import { resolve, dirname, join } from 'node:path';
 import { ExtractConfig } from '../types/index.js';
 
 function printVersion() {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pkg = require('../../package.json');
-  console.log(pkg.version);
+  try {
+    // Walk up from this file to find package.json.
+    // Works from dist/, dist-cjs/, or Deno entry points.
+    // Use __dirname in CJS, createRequire in ESM, or process.argv[1] as last resort.
+    let dir: string;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      dir = typeof __dirname !== 'undefined' ? __dirname : dirname(process.argv[1]);
+    } catch {
+      dir = process.cwd();
+    }
+    let cur = dir;
+    let pkg: { version: string } | undefined;
+    for (let i = 0; i < 5; i++) {
+      const candidate = join(cur, 'package.json');
+      try { pkg = JSON.parse(readFileSync(candidate, 'utf8')); break; } catch { /* next */ }
+      cur = dirname(cur);
+    }
+    console.log(pkg?.version ?? 'unknown');
+  } catch {
+    console.log('unknown');
+  }
 }
 
 function printHelp() {
-  console.log(`assert-json-body <command> [options]\n\nCommands:\n  extract            Run extraction (default)\n  init-config        Create example assert-json-body.config.json\n  help               Show this help\n  version            Print version\n\nExtraction Options (CLI/env override config.extract):\n  --repo=URL\n  --specPath=PATH\n  --ref=REF                 (branch/tag/sha)\n  --outputDir=DIR           (default: json-body-assertions)\n  --responsesFile=FILE      (override output file path)\n  --preserveCheckout        (do not delete temp git checkout)\n  --dryRun                  (simulate, no filesystem writes)\n  --failIfExists            (error if responses file exists)\n  --logLevel=VAL            (silent|error|warn|info|debug)\n  --config=FILE             (explicit config file path)\n\nValidation (env overrides only for now):\n  AJB_RECORD / TEST_RESPONSE_BODY_RECORD (enable global recording)\n  AJB_THROW_ON_FAIL (default throw behaviour)\n\nSchema file resolution precedence:\n  explicit option > env (AJB_RESPONSES_FILE / ROUTE_TEST_RESPONSES_FILE) > config.extract.responsesFile or <outputDir>/responses.json > default ./json-body-assertions/responses.json\n`);
+  console.log(`assert-json-body <command> [options]\n\nCommands:\n  extract            Run extraction (default)\n  init-config        Create example assert-json-body.config.json\n  help               Show this help\n  version            Print version\n\nExtraction Options (CLI/env override config.extract):\n  --repo=URL\n  --specPath=PATH\n  --ref=REF                 (branch/tag/sha)\n  --specFile=FILE           (local spec file; skips git checkout)\n  --outputDir=DIR           (default: json-body-assertions)\n  --responsesFile=FILE      (override output file path)\n  --preserveCheckout        (do not delete temp git checkout)\n  --dryRun                  (simulate, no filesystem writes)\n  --failIfExists            (error if responses file exists)\n  --logLevel=VAL            (silent|error|warn|info|debug)\n  --config=FILE             (explicit config file path)\n\nValidation (env overrides only for now):\n  AJB_RECORD / TEST_RESPONSE_BODY_RECORD (enable global recording)\n  AJB_THROW_ON_FAIL (default throw behaviour)\n\nSchema file resolution precedence:\n  explicit option > env (AJB_RESPONSES_FILE / ROUTE_TEST_RESPONSES_FILE) > config.extract.responsesFile or <outputDir>/responses.json > default ./json-body-assertions/responses.json\n`);
 }
 
 function initConfig() {

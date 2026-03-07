@@ -35,6 +35,8 @@
     "build:esm": "tsc -p tsconfig.json",
     "build:cjs": "tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist-cjs/package.json",
     "build": "npm run build:esm && npm run build:cjs",
+    "build:deno": "./scripts/build-deno.sh",
+    "build:deno:cross": "./scripts/build-deno.sh --cross",
     "dev": "tsx watch src/index.ts",
     "dev:cli": "tsx watch src/cli/index.ts",
     "generate": "node ./dist/cli/index.js extract",
