@@ -1,3 +1,13 @@
+# [1.7.0](https://github.com/camunda/assert-json-body/compare/v1.6.2...v1.7.0) (2026-03-07)
+
+### Bug Fixes
+
+- hide import.meta from TS analysis ([98330f6](https://github.com/camunda/assert-json-body/commit/98330f693706c1e933287410d17dda469cf4ab8d))
+
+### Features
+
+- add binary build with GitHub release, and support regeneration from local checkout ([14d87e9](https://github.com/camunda/assert-json-body/commit/14d87e9a83af75d416b8a383bfbad8093396de3a))
+
 ## [1.6.2](https://github.com/camunda/assert-json-body/compare/v1.6.1...v1.6.2) (2026-03-04)
 
 ### Bug Fixes
