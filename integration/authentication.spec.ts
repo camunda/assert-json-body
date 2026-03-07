@@ -18,7 +18,7 @@ let typedValidate: any; // will load from generated index.ts after extraction
 describe('integration: /license', () => {
   beforeAll(async () => {
     workDir = mkdtempSync(join(tmpdir(), 'ajb-int-'));
-  const outDir = join(workDir, 'json-body-assertions');
+    const outDir = join(workDir, 'json-body-assertions');
     mkdirSync(outDir, { recursive: true });
     // Run extraction with defaults (will use default repo/spec)
     await generate({ outputDir: outDir });
@@ -30,7 +30,10 @@ describe('integration: /license', () => {
         typedValidate = generated.validateResponseShape;
       }
     } catch (e) {
-      console.warn('Failed to load generated typed validator, falling back to base:', (e as Error).message);
+      console.warn(
+        'Failed to load generated typed validator, falling back to base:',
+        (e as Error).message
+      );
       // fallback lazy import of root package if needed
       const base = await import('../src/index.js');
       typedValidate = base.validateResponseShape;
@@ -40,7 +43,11 @@ describe('integration: /license', () => {
   afterAll(() => {
     if (workDir) {
       // eslint-disable-next-line no-empty
-      try { rmSync(workDir, { recursive: true, force: true }); } catch {}
+      try {
+        rmSync(workDir, { recursive: true, force: true });
+      } catch {
+        /* deliberately left empty */
+      }
     }
   });
 
@@ -50,13 +57,18 @@ describe('integration: /license', () => {
     try {
       json = await httpGetJson(baseUrl + '/license'); // fetch a route to ensure server is up
     } catch {
-      console.warn('Server not reachable; start the service or set TEST_BASE_URL to run integration test');
+      console.warn(
+        'Server not reachable; start the service or set TEST_BASE_URL to run integration test'
+      );
       return; // treat as soft skip
     }
 
     // Non-throw structured result
-  const validatorFn = typedValidate || (await import('../src/index.js')).validateResponseShape;
-  const result = validatorFn({ path: '/license', method: 'GET', status: '200' }, json, { throw: false, responsesFilePath });
+    const validatorFn = typedValidate || (await import('../src/index.js')).validateResponseShape;
+    const result = validatorFn({ path: '/license', method: 'GET', status: '200' }, json, {
+      throw: false,
+      responsesFilePath,
+    });
     expect(result).toBeTruthy();
     if (!result!.ok) {
       console.error('Validation errors:', result!.errors);

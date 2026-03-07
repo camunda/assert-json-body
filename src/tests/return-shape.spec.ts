@@ -10,11 +10,22 @@ describe('validateResponseShape return shape', () => {
     const outDir = join(work, 'json-body-assertions');
     mkdirSync(outDir, { recursive: true });
     // minimal responses.json
-    const responses = { responses: [ { path: '/r', method: 'GET', status: '200', schema: { required: [ { name: 'id', type: 'string' } ], optional: [] } } ] };
+    const responses = {
+      responses: [
+        {
+          path: '/r',
+          method: 'GET',
+          status: '200',
+          schema: { required: [{ name: 'id', type: 'string' }], optional: [] },
+        },
+      ],
+    };
     writeFileSync(join(outDir, 'responses.json'), JSON.stringify(responses, null, 2));
     process.chdir(work);
     const body = { id: 'abc' };
-    const result = validateResponseShape({ path: '/r', method: 'GET', status: '200' }, body, { throw: false });
+    const result = validateResponseShape({ path: '/r', method: 'GET', status: '200' }, body, {
+      throw: false,
+    });
     expect(result).toBeTruthy();
     expect(result!.ok).toBe(true);
     expect(result!.response).toBe(body);
@@ -26,11 +37,22 @@ describe('validateResponseShape return shape', () => {
     const work = mkdtempSync(join(tmpdir(), 'ajb-return-'));
     const outDir = join(work, 'json-body-assertions');
     mkdirSync(outDir, { recursive: true });
-    const responses = { responses: [ { path: '/r', method: 'GET', status: '200', schema: { required: [ { name: 'id', type: 'string' } ], optional: [] } } ] };
+    const responses = {
+      responses: [
+        {
+          path: '/r',
+          method: 'GET',
+          status: '200',
+          schema: { required: [{ name: 'id', type: 'string' }], optional: [] },
+        },
+      ],
+    };
     writeFileSync(join(outDir, 'responses.json'), JSON.stringify(responses, null, 2));
     process.chdir(work);
     const body = { other: 'x' };
-    const result = validateResponseShape({ path: '/r', method: 'GET', status: '200' }, body, { throw: false });
+    const result = validateResponseShape({ path: '/r', method: 'GET', status: '200' }, body, {
+      throw: false,
+    });
     expect(result).toBeTruthy();
     expect(result!.ok).toBe(false);
     expect(result!.errors && result!.errors.length).toBeGreaterThan(0);

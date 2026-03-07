@@ -22,7 +22,7 @@ export interface PlaywrightAPIResponse {
   /**
    * An object with all the response HTTP headers associated with this response.
    */
-  headers(): { [key: string]: string; };
+  headers(): { [key: string]: string };
 
   /**
    * An array with all the response HTTP headers associated with this response. Header names are not lower-cased.

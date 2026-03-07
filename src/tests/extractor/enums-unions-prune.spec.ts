@@ -7,12 +7,8 @@ import { OpenAPIV3 } from 'openapi-types';
 
 const components = {
   MergedEnum: {
-    allOf: [
-      { enum: ['X', 'Y'] },
-      { enum: ['Y', 'Z'] },
-      { type: 'string' }
-    ]
-  }
+    allOf: [{ enum: ['X', 'Y'] }, { enum: ['Y', 'Z'] }, { type: 'string' }],
+  },
 };
 
 describe('enum merging', () => {
@@ -20,36 +16,47 @@ describe('enum merging', () => {
     const schema = {
       type: 'object',
       properties: {
-        status: { allOf: [ { enum: ['A','B'] }, { enum: ['B','C'] }, { type: 'string' } ] }
+        status: { allOf: [{ enum: ['A', 'B'] }, { enum: ['B', 'C'] }, { type: 'string' }] },
       },
-      required: ['status']
+      required: ['status'],
     } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
-  const field = out.required.find((f: any) => f.name === 'status');
-    expect(field?.enumValues).toEqual(['A','B','C']);
+    const field = out.required.find((f: any) => f.name === 'status');
+    expect(field?.enumValues).toEqual(['A', 'B', 'C']);
   });
 
   it('merges enums via $ref wrapper', () => {
-    const schema = { type: 'object', properties: { code: { $ref: '#/components/schemas/MergedEnum' } }, required: ['code'] } as OpenAPIV3.SchemaObject;
+    const schema = {
+      type: 'object',
+      properties: { code: { $ref: '#/components/schemas/MergedEnum' } },
+      required: ['code'],
+    } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, components as any);
-  const field = out.required.find((f: any) => f.name === 'code');
-    expect(field?.enumValues).toEqual(['X','Y','Z']);
+    const field = out.required.find((f: any) => f.name === 'code');
+    expect(field?.enumValues).toEqual(['X', 'Y', 'Z']);
   });
 });
 
 describe('union (oneOf/anyOf) handling', () => {
   it('represents oneOf primitive union normalized (string|number)', () => {
-    const schema = { type: 'object', properties: { value: { oneOf: [ { type: 'string' }, { type: 'integer', format: 'int32' } ] } }, required: ['value'] } as OpenAPIV3.SchemaObject;
+    const schema = {
+      type: 'object',
+      properties: { value: { oneOf: [{ type: 'string' }, { type: 'integer', format: 'int32' }] } },
+      required: ['value'],
+    } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
-  const field = out.required.find((f: any) => f.name === 'value');
+    const field = out.required.find((f: any) => f.name === 'value');
     // flatten applies describeType then normalizeType; ensure normalization collapsed integer
     expect(field?.type).toBe('string|number');
   });
 
   it('represents anyOf union', () => {
-    const schema = { type: 'object', properties: { data: { anyOf: [ { type: 'string' }, { type: 'integer', format: 'int64' } ] } } } as OpenAPIV3.SchemaObject;
+    const schema = {
+      type: 'object',
+      properties: { data: { anyOf: [{ type: 'string' }, { type: 'integer', format: 'int64' }] } },
+    } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
-  const field = out.optional.find((f: any) => f.name === 'data');
+    const field = out.optional.find((f: any) => f.name === 'data');
     // order should match traversal, normalization collapses integer
     expect(field?.type).toBe('string|number');
   });
@@ -58,11 +65,11 @@ describe('union (oneOf/anyOf) handling', () => {
 describe('pruneSchema', () => {
   it('removes empty children objects', () => {
     const schema: OutputSchema = {
-      required: [ { name: 'emptyObj', type: 'object', children: { required: [], optional: [] } } ],
-      optional: []
+      required: [{ name: 'emptyObj', type: 'object', children: { required: [], optional: [] } }],
+      optional: [],
     };
     pruneSchema(schema);
-    const field = schema.required.find(f => f.name === 'emptyObj');
+    const field = schema.required.find((f) => f.name === 'emptyObj');
     expect(field && 'children' in field).toBe(false);
   });
 });
@@ -75,14 +82,14 @@ describe('mixed object + primitive unions', () => {
         payload: {
           oneOf: [
             { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
-            { type: 'string' }
-          ]
-        }
+            { type: 'string' },
+          ],
+        },
       },
-      required: ['payload']
+      required: ['payload'],
     } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
-  const field = out.required.find((f: any) => f.name === 'payload');
+    const field = out.required.find((f: any) => f.name === 'payload');
     expect(field?.type).toBe('object|string');
   });
 
@@ -94,13 +101,13 @@ describe('mixed object + primitive unions', () => {
           anyOf: [
             { type: 'array', items: { type: 'integer', format: 'int32' } },
             { type: 'object', properties: { flag: { type: 'boolean' } }, required: ['flag'] },
-            { type: 'string' }
-          ]
-        }
-      }
+            { type: 'string' },
+          ],
+        },
+      },
     } as OpenAPIV3.SchemaObject;
     const out = flatten(schema, {} as any);
-  const field = out.optional.find((f: any) => f.name === 'variant');
+    const field = out.optional.find((f: any) => f.name === 'variant');
     expect(field?.type).toBe('array<number>|object|string');
   });
 });

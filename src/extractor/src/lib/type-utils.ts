@@ -13,11 +13,17 @@ export function normalizeType(t: string): string {
   return t;
 }
 
-export function refNameOf(t: string): string { return t.split('<').pop()!.replace(/>.*/, ''); }
+export function refNameOf(t: string): string {
+  return t.split('<').pop()!.replace(/>.*/, '');
+}
 
 export function dedupeFields(arr: FieldSpec[]): FieldSpec[] {
   const seen = new Set<string>();
   const out: FieldSpec[] = [];
-  for (const f of arr) if (!seen.has(f.name)) { out.push(f); seen.add(f.name); }
-  return out.sort((a,b)=>a.name.localeCompare(b.name));
+  for (const f of arr)
+    if (!seen.has(f.name)) {
+      out.push(f);
+      seen.add(f.name);
+    }
+  return out.sort((a, b) => a.name.localeCompare(b.name));
 }

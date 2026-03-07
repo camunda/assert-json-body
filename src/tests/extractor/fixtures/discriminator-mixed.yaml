@@ -28,8 +28,8 @@ components:
       required: [type]
       properties:
         type:
-            type: string
-            enum: [objectBranch, primitiveBranch]
+          type: string
+          enum: [objectBranch, primitiveBranch]
       oneOf:
         - $ref: '#/components/schemas/ObjectBranchResult'
         - $ref: '#/components/schemas/PrimitiveBranchWrapper'

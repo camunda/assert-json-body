@@ -24,7 +24,7 @@ const ENV_KEYS = [
   'AJB_FAIL_IF_EXISTS',
   'AJB_RECORD',
   'TEST_RESPONSE_BODY_RECORD',
-  'AJB_THROW_ON_FAIL'
+  'AJB_THROW_ON_FAIL',
 ] as const;
 
 describe('buildConfig', () => {
@@ -47,16 +47,25 @@ describe('buildConfig', () => {
 
   afterEach(() => {
     process.argv = prevArgv;
-  try { process.chdir(prevCwd); } catch { /* ignore */ }
-  try { rmSync(workdir, { recursive: true, force: true }); } catch { /* ignore */ }
+    try {
+      process.chdir(prevCwd);
+    } catch {
+      /* ignore */
+    }
+    try {
+      rmSync(workdir, { recursive: true, force: true });
+    } catch {
+      /* ignore */
+    }
     for (const key of ENV_KEYS) {
       const value = savedEnv.get(key);
-      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
     }
   });
 
   it('parses configuration file values into resolved config', () => {
-  const configPath = join(process.cwd(), 'assert-json-body.config.json');
+    const configPath = join(process.cwd(), 'assert-json-body.config.json');
     const file = {
       extract: {
         repo: 'https://example.com/custom.git',
@@ -67,21 +76,21 @@ describe('buildConfig', () => {
         dryRun: true,
         logLevel: 'debug',
         failIfExists: true,
-        responsesFile: './custom/responses.json'
+        responsesFile: './custom/responses.json',
       },
       validate: {
         recordResponses: true,
-        throwOnValidationFail: false
-      }
+        throwOnValidationFail: false,
+      },
     } as const;
     writeFileSync(configPath, JSON.stringify(file, null, 2));
 
     const resolution = buildConfig();
 
-  expect(resolution.filePath).toBe(configPath);
+    expect(resolution.filePath).toBe(configPath);
     expect(resolution.warnings).toEqual([]);
-  expect(resolution.file?.extract?.repo).toBe(file.extract.repo);
-  expect(resolution.file?.validate?.recordResponses).toBe(true);
+    expect(resolution.file?.extract?.repo).toBe(file.extract.repo);
+    expect(resolution.file?.validate?.recordResponses).toBe(true);
 
     const { extract, validate } = resolution.resolved;
     expect(extract.repo).toBe(file.extract.repo);
@@ -104,7 +113,9 @@ describe('buildConfig', () => {
     const resolution = buildConfig();
     expect(resolution.filePath).toBeUndefined();
     expect(resolution.warnings).toEqual([]);
-    expect(resolution.resolved.extract.specPath).toBe('zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml');
+    expect(resolution.resolved.extract.specPath).toBe(
+      'zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml'
+    );
     expect(resolution.resolved.extract.repo).toBe('https://github.com/camunda/camunda');
   });
 });

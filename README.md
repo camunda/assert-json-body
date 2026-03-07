@@ -4,6 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/assert-json-body.svg)](https://www.npmjs.com/package/assert-json-body)
 
 Framework-agnostic toolkit to:
+
 - Extract OpenAPI response schemas into a compact `responses.json` artifact
 - Validate real JSON response bodies against the extracted required/optional field model
 - Assert inside any test runner (Vitest, Jest, Playwright, etc.)
@@ -17,74 +18,99 @@ npm install assert-json-body
 ## Quick Start
 
 1. (Optional) Initialize a config file:
-	 ```
-	 npx assert-json-body config:init
-	 ```
-	 Produces `assert-json-body.config.json` (edit repo, spec path, output dir, etc.).
+
+   ```
+   npx assert-json-body config:init
+   ```
+
+   Produces `assert-json-body.config.json` (edit repo, spec path, output dir, etc.).
 
 2. Extract responses from your OpenAPI spec:
-	 ```
-	 npx assert-json-body extract
-	 ```
-	 This writes (by default):
-	 - `./json-body-assertions/responses.json` (schema bundle)
-	 - `./json-body-assertions/index.ts` (auto-generated typed wrapper)
-	 or the configured `responsesFile` for the JSON schema artifact.
 
-	 The init step also adds an npm script for convenience:
-	 ```jsonc
-	 // package.json
-	 {
-	   "scripts": {
-	     "responses:regenerate": "assert-json-body extract"
-	   }
-	 }
-	 ```
-	 So you can run:
-	 ```
-	 npm run responses:regenerate
-	 ```
+   ```
+   npx assert-json-body extract
+   ```
+
+   This writes (by default):
+   - `./json-body-assertions/responses.json` (schema bundle)
+   - `./json-body-assertions/index.ts` (auto-generated typed wrapper)
+     or the configured `responsesFile` for the JSON schema artifact.
+
+   The init step also adds an npm script for convenience:
+
+   ```jsonc
+   // package.json
+   {
+     "scripts": {
+       "responses:regenerate": "assert-json-body extract",
+     },
+   }
+   ```
+
+   So you can run:
+
+   ```
+   npm run responses:regenerate
+   ```
 
 3. Validate in a test (untyped import):
-	```ts
-	import { validateResponseShape, validateResponse } from 'assert-json-body';
 
-	// Suppose you just performed an HTTP request and have jsonBody
-	validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, jsonBody);
-	// Throws if JSON shape violates required field presence / type rules.
+   ```ts
+   import { validateResponseShape, validateResponse } from 'assert-json-body';
 
-	// Playwright convenience helper: consumes APIResponse, checks HTTP status, then validates JSON
-	await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, playwrightResponse);
-	```
+   // Suppose you just performed an HTTP request and have jsonBody
+   validateResponseShape(
+     { path: '/process-instance/create', method: 'POST', status: '200' },
+     jsonBody
+   );
+   // Throws if JSON shape violates required field presence / type rules.
+
+   // Playwright convenience helper: consumes APIResponse, checks HTTP status, then validates JSON
+   await validateResponse(
+     { path: '/process-instance/create', method: 'POST', status: '200' },
+     playwrightResponse
+   );
+   ```
 
 4. Prefer typed validation (after extract):
-	```ts
-	import { validateResponseShape, validateResponse } from './json-body-assertions/index';
 
-	 // Now path/method/status are constrained to extracted endpoints
-	 validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, jsonBody);
-	await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, playwrightResponse);
+   ```ts
+   import { validateResponseShape, validateResponse } from './json-body-assertions/index';
 
-	 // @ts-expect-error invalid status not in spec
-	 // validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '418' }, jsonBody);
-	 ```
+   // Now path/method/status are constrained to extracted endpoints
+   validateResponseShape(
+     { path: '/process-instance/create', method: 'POST', status: '200' },
+     jsonBody
+   );
+   await validateResponse(
+     { path: '/process-instance/create', method: 'POST', status: '200' },
+     playwrightResponse
+   );
+
+   // @ts-expect-error invalid status not in spec
+   // validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '418' }, jsonBody);
+   ```
 
 Regenerate typed file whenever the spec changes by re-running `extract` (commit both `responses.json` and `index.ts` if you track API contract changes in version control).
 
 You can control default throw/record behavior globally via config or env (see below) and override per call.
 
 ### CI Integration
+
 Keep the generated artifacts (`responses.json`, `index.ts`) in sync with the upstream spec during continuous integration:
 
 Example GitHub Actions step (add after install):
+
 ```yaml
 	- name: Regenerate response schemas
 		run: npm run responses:regenerate
 ```
 
 If you commit the generated files:
+
 1. Run the regenerate step early (before tests).
 2. Add a check that the working tree is clean to ensure developers didn’t forget to re-run extraction locally:
+
 ```yaml
 	- name: Verify no uncommitted changes
 		run: |
@@ -92,6 +118,7 @@ If you commit the generated files:
 ```
 
 If you prefer not to commit generated artifacts:
+
 - Add the output directory (default `json-body-assertions/`) to `.gitignore`.
 - Always run `npm run responses:regenerate` before building / testing.
 
@@ -102,11 +129,13 @@ Caching tip: if your spec repo is large, you can cache the sparse checkout direc
 Pre-built standalone binaries are attached to each [GitHub release](https://github.com/camunda/assert-json-body/releases). These are self-contained executables compiled with Deno — no Node.js or npm installation needed.
 
 Available platforms:
+
 - `x86_64-unknown-linux-gnu` / `aarch64-unknown-linux-gnu`
 - `x86_64-apple-darwin` / `aarch64-apple-darwin`
 - `x86_64-pc-windows-msvc`
 
 Usage in CI (e.g. GitHub Actions):
+
 ```yaml
 - name: Download assert-json-body
   run: |
@@ -121,6 +150,7 @@ Usage in CI (e.g. GitHub Actions):
 ```
 
 To build locally (requires Deno ≥ 2.x):
+
 ```bash
 npm run build:deno          # local platform
 npm run build:deno:cross    # all platforms
@@ -137,19 +167,19 @@ When `specFile` (or `AJB_SPEC_FILE`) is set, the `repo`, `specPath`, `ref`, and 
 The orchestration-cluster e2e test suite lives at `qa/c8-orchestration-cluster-e2e-test-suite/` and already checks out the branch under test. The spec file is at `zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml` in the repo root. Add these steps **before** `npm install` / `npm run test`:
 
 ```yaml
-      # ── Regenerate response schemas from the branch's spec ──────────
-      - name: Download assert-json-body binary
-        run: |
-          curl -fsSL -o /usr/local/bin/assert-json-body \
-            "https://github.com/camunda/assert-json-body/releases/latest/download/assert-json-body-x86_64-unknown-linux-gnu"
-          chmod +x /usr/local/bin/assert-json-body
+# ── Regenerate response schemas from the branch's spec ──────────
+- name: Download assert-json-body binary
+  run: |
+    curl -fsSL -o /usr/local/bin/assert-json-body \
+      "https://github.com/camunda/assert-json-body/releases/latest/download/assert-json-body-x86_64-unknown-linux-gnu"
+    chmod +x /usr/local/bin/assert-json-body
 
-      - name: Regenerate response schemas from local spec
-        run: assert-json-body extract
-        env:
-          AJB_SPEC_FILE: ${{ github.workspace }}/zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml
-          AJB_OUTPUT_DIR: ${{ github.workspace }}/qa/c8-orchestration-cluster-e2e-test-suite/json-body-assertions
-      # ────────────────────────────────────────────────────────────────
+- name: Regenerate response schemas from local spec
+  run: assert-json-body extract
+  env:
+    AJB_SPEC_FILE: ${{ github.workspace }}/zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml
+    AJB_OUTPUT_DIR: ${{ github.workspace }}/qa/c8-orchestration-cluster-e2e-test-suite/json-body-assertions
+# ────────────────────────────────────────────────────────────────
 ```
 
 That's it — no Node.js setup, no `npm install`, and no second git clone required. The binary reads the spec file that is already on disk from the workflow's checkout step and writes `responses.json` directly into the test suite's `json-body-assertions/` directory.
@@ -167,53 +197,55 @@ The configuration is now split into two blocks:
 
 ### extract block
 
-| Field | Type | Default | Description | Env override(s) |
-|-------|------|---------|-------------|-----------------|
-| `repo` | string | `https://github.com/camunda/camunda` | Git repository containing the OpenAPI spec | `AJB_REPO`, `REPO` |
-| `specPath` | string | `zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml` | Path to OpenAPI spec inside the repo | `AJB_SPEC_PATH`, `SPEC_PATH` |
-| `specFile` | string | — | Local spec file path (skips git checkout entirely) | `AJB_SPEC_FILE` |
-| `ref` | string | `main` | Git ref (branch/tag/sha) to checkout | `AJB_REF`, `SPEC_REF`, `REF` |
-| `outputDir` | string | `json-body-assertions` | Directory to write `responses.json` + generated `index.ts` | `AJB_OUTPUT_DIR`, `OUTPUT_DIR` |
-| `preserveCheckout` | boolean | `false` | Keep sparse checkout working copy (debug) | `AJB_PRESERVE_CHECKOUT`, `PRESERVE_SPEC_CHECKOUT` |
-| `dryRun` | boolean | `false` | Parse spec but do not write files | `AJB_DRY_RUN` |
-| `logLevel` | enum | `info` | `silent` `error` `warn` `info` `debug` | `AJB_LOG_LEVEL` |
-| `failIfExists` | boolean | `false` | Abort if target responses file already exists | `AJB_FAIL_IF_EXISTS` |
-| `responsesFile` | string | — | Optional explicit path for responses JSON (advanced) | `AJB_RESPONSES_FILE`, `ROUTE_TEST_RESPONSES_FILE` |
+| Field              | Type    | Default                                                  | Description                                                | Env override(s)                                   |
+| ------------------ | ------- | -------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------- |
+| `repo`             | string  | `https://github.com/camunda/camunda`                     | Git repository containing the OpenAPI spec                 | `AJB_REPO`, `REPO`                                |
+| `specPath`         | string  | `zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml` | Path to OpenAPI spec inside the repo                       | `AJB_SPEC_PATH`, `SPEC_PATH`                      |
+| `specFile`         | string  | —                                                        | Local spec file path (skips git checkout entirely)         | `AJB_SPEC_FILE`                                   |
+| `ref`              | string  | `main`                                                   | Git ref (branch/tag/sha) to checkout                       | `AJB_REF`, `SPEC_REF`, `REF`                      |
+| `outputDir`        | string  | `json-body-assertions`                                   | Directory to write `responses.json` + generated `index.ts` | `AJB_OUTPUT_DIR`, `OUTPUT_DIR`                    |
+| `preserveCheckout` | boolean | `false`                                                  | Keep sparse checkout working copy (debug)                  | `AJB_PRESERVE_CHECKOUT`, `PRESERVE_SPEC_CHECKOUT` |
+| `dryRun`           | boolean | `false`                                                  | Parse spec but do not write files                          | `AJB_DRY_RUN`                                     |
+| `logLevel`         | enum    | `info`                                                   | `silent` `error` `warn` `info` `debug`                     | `AJB_LOG_LEVEL`                                   |
+| `failIfExists`     | boolean | `false`                                                  | Abort if target responses file already exists              | `AJB_FAIL_IF_EXISTS`                              |
+| `responsesFile`    | string  | —                                                        | Optional explicit path for responses JSON (advanced)       | `AJB_RESPONSES_FILE`, `ROUTE_TEST_RESPONSES_FILE` |
 
 ### validate block
 
-| Field | Type | Default | Description | Env override(s) |
-|-------|------|---------|-------------|-----------------|
-| `recordResponses` | boolean | `false` | Globally enable body recording | `AJB_RECORD`, `TEST_RESPONSE_BODY_RECORD` |
-| `throwOnValidationFail` | boolean | `true` | Throw vs structured `{ ok:false }` result | `AJB_THROW_ON_FAIL` |
+| Field                   | Type    | Default | Description                               | Env override(s)                           |
+| ----------------------- | ------- | ------- | ----------------------------------------- | ----------------------------------------- |
+| `recordResponses`       | boolean | `false` | Globally enable body recording            | `AJB_RECORD`, `TEST_RESPONSE_BODY_RECORD` |
+| `throwOnValidationFail` | boolean | `true`  | Throw vs structured `{ ok:false }` result | `AJB_THROW_ON_FAIL`                       |
 
 Additional env variables:
 
-| Env | Purpose |
-|-----|---------|
+| Env                             | Purpose                                                                        |
+| ------------------------------- | ------------------------------------------------------------------------------ |
 | `TEST_RESPONSE_BODY_RECORD_DIR` | Override directory for JSONL body recordings (default `<outputDir>/recording`) |
 
 Example full config:
+
 ```json
 {
-	"extract": {
-		"repo": "https://github.com/camunda/camunda",
-		"specPath": "zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml",
-		"ref": "main",
-		"outputDir": "json-body-assertions",
-		"preserveCheckout": false,
-		"dryRun": false,
-		"logLevel": "info",
-		"failIfExists": false
-	},
-	"validate": {
-		"recordResponses": false,
-		"throwOnValidationFail": true
-	}
+  "extract": {
+    "repo": "https://github.com/camunda/camunda",
+    "specPath": "zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml",
+    "ref": "main",
+    "outputDir": "json-body-assertions",
+    "preserveCheckout": false,
+    "dryRun": false,
+    "logLevel": "info",
+    "failIfExists": false
+  },
+  "validate": {
+    "recordResponses": false,
+    "throwOnValidationFail": true
+  }
 }
 ```
 
 Notes:
+
 - The responses schema file defaults to `<outputDir>/responses.json` unless overridden.
 - Boolean env overrides accept `1|true|yes` (case-insensitive).
 - Precedence per value: CLI flag > environment variable > config file > built-in default.
@@ -221,6 +253,7 @@ Notes:
 ## Schema Resolution Precedence
 
 When `validateResponseShape` looks for the schema artifact, precedence is:
+
 1. Explicit option: `responsesFilePath` passed to the function
 2. Environment variable: `ROUTE_TEST_RESPONSES_FILE` or `AJB_RESPONSES_FILE`
 3. Config file: `extract.responsesFile` or `<outputDir>/responses.json`
@@ -231,52 +264,63 @@ All file issues (missing, unreadable, parse errors, malformed structure) throw c
 ## API Reference
 
 ### `validateResponseShape(spec, body, options?)`
+
 Single unified API: validates `body` against the schema entry. Supports optional structured result mode and recording.
 
 ```ts
-validateResponseShape(
-	{ path: '/foo', method: 'GET', status: '200' },
-	jsonBody,
-	{ responsesFilePath: './custom/responses.json', configPath: './custom-config.json' }
-);
+validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, jsonBody, {
+  responsesFilePath: './custom/responses.json',
+  configPath: './custom-config.json',
+});
 ```
+
 Default behavior: throws on mismatch (configurable). If you pass `throw:false` (or set global flag) it returns a structured object:
 
 ```ts
 interface ValidateResultBase {
-	ok: boolean;
-	errors?: string[];          // present when ok === false
-	response: unknown;          // the original response body you passed in
-	routeContext: RouteContext; // resolved route/method/status + flattened field specs
+  ok: boolean;
+  errors?: string[]; // present when ok === false
+  response: unknown; // the original response body you passed in
+  routeContext: RouteContext; // resolved route/method/status + flattened field specs
 }
 ```
 
 Examples:
+
 ```ts
 // Success (non-throw mode)
-const r1 = validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, body, { throw: false });
+const r1 = validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, body, {
+  throw: false,
+});
 if (!r1.ok) throw new Error('unexpected');
-console.log(r1.routeContext.requiredFields.map(f => f.name));
+console.log(r1.routeContext.requiredFields.map((f) => f.name));
 
 // Failure (non-throw mode)
-const r2 = validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, otherBody, { throw: false });
+const r2 = validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, otherBody, {
+  throw: false,
+});
 if (!r2.ok) {
-	console.warn(r2.errors);            // array of error lines
-	console.log(r2.routeContext.status); // resolved status used
+  console.warn(r2.errors); // array of error lines
+  console.log(r2.routeContext.status); // resolved status used
 }
 ```
 
 #### Options
+
 - `responsesFilePath` / `configPath` – override resolution
 - `throw?: boolean` – override global throw setting
 - `record?: boolean | { label?: string }` – enable recording for this call
 
 ### `validateResponse(spec, playwrightResponse, options?)`
+
 Playwright-friendly wrapper: reads `await response.json()`, optionally enforces the expected status, then routes through `validateResponseShape`.
 
 ```ts
 const apiResponse = await request.post('/process-instance/create', { data: payload });
-await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, apiResponse);
+await validateResponse(
+  { path: '/process-instance/create', method: 'POST', status: '200' },
+  apiResponse
+);
 ```
 
 - `spec.status` is required when you need HTTP status enforcement; the helper throws if it does not match `response.status()`.
@@ -294,25 +338,33 @@ The validator respects the OpenAPI `nullable: true` property. When a field in th
 The `nullable` flag is extracted automatically during `assert-json-body extract` and stored in `responses.json`. You can also set it manually in a custom responses file:
 
 ```json
-{"name": "label", "type": "string", "nullable": true}
+{ "name": "label", "type": "string", "nullable": true }
 ```
 
 ### Types
+
 `FieldSpec`, `RouteContext`, `PlaywrightAPIResponse`, and other structural types are exported from `@/types`.
 
 ### Generated Typed Entry (after extract)
+
 After running the extractor you can import strongly-typed versions of `validateResponseShape` and `validateResponse` that constrain `path`, `method` and `status` to only the extracted endpoints:
+
 ```ts
 import { validateResponseShape, validateResponse } from './json-body-assertions/index';
 
 // Autocomplete + compile-time safety for path/method/status
 validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '200' }, body);
-await validateResponse({ path: '/process-instance/create', method: 'POST', status: '200' }, playwrightResponse);
+await validateResponse(
+  { path: '/process-instance/create', method: 'POST', status: '200' },
+  playwrightResponse
+);
 
 // @ts-expect-error invalid status for that route will fail type-check
 // validateResponseShape({ path: '/process-instance/create', method: 'POST', status: '418' }, body);
 ```
+
 You can also use the exported helper types:
+
 ```ts
 import type { RoutePath, MethodFor, StatusFor } from './json-body-assertions/index';
 
@@ -346,6 +398,7 @@ Yes. The extractor automatically bundles referenced files (via `$ref`) as long a
 ## Releasing & Versioning
 
 This project uses [semantic-release](https://semantic-release.gitbook.io/) with Conventional Commits to automate:
+
 - Version determination (based on commit messages)
 - CHANGELOG generation (`CHANGELOG.md`)
 - GitHub release notes
@@ -354,6 +407,7 @@ This project uses [semantic-release](https://semantic-release.gitbook.io/) with 
 Every push to `main` triggers the release workflow. Ensure your commits follow Conventional Commit prefixes so changes are categorized correctly:
 
 Common types:
+
 - `feat:` – new feature (minor release)
 - `fix:` – bug fix (patch release)
 - `docs:` – documentation only
@@ -365,6 +419,7 @@ Common types:
 Breaking changes: add a footer line `BREAKING CHANGE: <description>` (or use `!` after the type, e.g. `feat!: drop Node 16`).
 
 Example commit message:
+
 ```
 feat: add structured validation result for non-throw mode
 
@@ -377,12 +432,13 @@ Local commit messages are validated by commitlint + husky (commit-msg hook). If 
 
 ## CLI Commands
 
-| Command | Description |
-|---------|-------------|
-| `assert-json-body extract` | Performs sparse checkout + OpenAPI parse + response schema flattening into `responses.json` and emits typed `index.ts`. |
-| `assert-json-body config:init` | Creates a starter `assert-json-body.config.json`. |
+| Command                        | Description                                                                                                             |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `assert-json-body extract`     | Performs sparse checkout + OpenAPI parse + response schema flattening into `responses.json` and emits typed `index.ts`. |
+| `assert-json-body config:init` | Creates a starter `assert-json-body.config.json`.                                                                       |
 
 Environment variables (selected):
+
 - `ROUTE_TEST_RESPONSES_FILE` / `AJB_RESPONSES_FILE` – override schema file
 - `TEST_RESPONSE_BODY_RECORD_DIR` – override recording directory (default `<outputDir>/recording`)
 - `AJB_RECORD` / `TEST_RESPONSE_BODY_RECORD` – set default recording on (true/1/yes)
@@ -391,12 +447,16 @@ Environment variables (selected):
 ## Recording (Optional)
 
 By default, recordings are written to `<outputDir>/recording` (e.g. `json-body-assertions/recording`). Set `TEST_RESPONSE_BODY_RECORD_DIR` only if you want a custom location. To record responses, either:
+
 ```ts
 // Per-call recording
-validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, body, { record: { label: 'GET /foo success' } });
+validateResponseShape({ path: '/foo', method: 'GET', status: '200' }, body, {
+  record: { label: 'GET /foo success' },
+});
 
 // Or enable globally (env): AJB_RECORD=true
 ```
+
 Produces JSONL rows with required field list, top-level present, deep presence and body snapshot.
 
 ## Integration Tests
@@ -404,20 +464,24 @@ Produces JSONL rows with required field list, top-level present, deep presence a
 An optional end-to-end integration test suite lives under `integration/` and is excluded from the default unit test run.
 
 Run unit tests (fast, pure):
+
 ```
 npm test
 ```
 
 Run integration tests (performs real OpenAPI extraction and live HTTP calls):
+
 ```
 npm run test:integration
 ```
 
 Local requirements:
+
 - Start the target service (expected at `http://localhost:8080` by default), or
 - Set `TEST_BASE_URL` to point to a running instance
 
 CI (Docker) example:
+
 ```yaml
 	- name: Start API container
 		run: |
@@ -438,5 +502,5 @@ Errors show a capped (first 15) list of issues (missing, type, enum, extra) with
 See `src/tests/precedence.spec.ts` for an executable example verifying explicit > env > config > default ordering.
 
 ## License
-ISC (see `LICENSE`).
 
+ISC (see `LICENSE`).

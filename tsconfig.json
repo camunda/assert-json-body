@@ -23,11 +23,5 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "dist",
-    "dist-cjs",
-    "node_modules",
-    "src/**/*.spec.ts",
-    "src/tests/**"
-  ]
+  "exclude": ["dist", "dist-cjs", "node_modules", "src/**/*.spec.ts", "src/tests/**"]
 }

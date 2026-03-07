@@ -4,7 +4,12 @@ import { flatten, SchemaOrRef } from './schema-flatten.js';
 import { resolveRef } from './ref-resolver.js';
 import { OpenAPIV3 } from 'openapi-types';
 
-export function buildSchemaTree(schema: SchemaOrRef, components: Record<string, SchemaOrRef>, seen = new Set<string>(), doc?: OpenAPIV3.Document): OutputSchema {
+export function buildSchemaTree(
+  schema: SchemaOrRef,
+  components: Record<string, SchemaOrRef>,
+  seen = new Set<string>(),
+  doc?: OpenAPIV3.Document
+): OutputSchema {
   const flat = flatten(schema, components, seen, doc);
   for (const group of [flat.required, flat.optional]) {
     for (const field of group) {
@@ -14,7 +19,12 @@ export function buildSchemaTree(schema: SchemaOrRef, components: Record<string, 
         if ((kind === 'object' || kind === 'array-object') && target) {
           field.children = buildSchemaTree(target, components, new Set(seen), doc);
         } else if (kind === 'ref-object' && target) {
-          field.children = buildSchemaTree(target, components, new Set(seen.add(refNameOf(field.type))), doc);
+          field.children = buildSchemaTree(
+            target,
+            components,
+            new Set(seen.add(refNameOf(field.type))),
+            doc
+          );
         }
       }
     }
@@ -22,7 +32,12 @@ export function buildSchemaTree(schema: SchemaOrRef, components: Record<string, 
   return flat;
 }
 
-export function resolveFieldSchema(fieldName: string, parentSchema: SchemaOrRef, components: Record<string, SchemaOrRef>, doc?: OpenAPIV3.Document): { kind: string; target?: SchemaOrRef } | null {
+export function resolveFieldSchema(
+  fieldName: string,
+  parentSchema: SchemaOrRef,
+  components: Record<string, SchemaOrRef>,
+  doc?: OpenAPIV3.Document
+): { kind: string; target?: SchemaOrRef } | null {
   const isRef = (s: SchemaOrRef): s is OpenAPIV3.ReferenceObject => '$ref' in s;
   const isSchemaObject = (s: SchemaOrRef): s is OpenAPIV3.SchemaObject => !('$ref' in s);
 
@@ -52,7 +67,8 @@ export function resolveFieldSchema(fieldName: string, parentSchema: SchemaOrRef,
       if (target) collect(target);
       return;
     }
-    if (isSchemaObject(sch) && sch.allOf) for (const part of sch.allOf as SchemaOrRef[]) collect(part);
+    if (isSchemaObject(sch) && sch.allOf)
+      for (const part of sch.allOf as SchemaOrRef[]) collect(part);
     if (isSchemaObject(sch) && sch.properties) Object.assign(propertyDefs, sch.properties);
   };
   collect(parentSchema);
@@ -62,11 +78,13 @@ export function resolveFieldSchema(fieldName: string, parentSchema: SchemaOrRef,
 
   if (isRef(propSchema)) {
     const target = resolveTarget(propSchema);
-    if (target && (target.type === 'object' || target.properties || target.allOf)) return { kind: 'ref-object', target };
+    if (target && (target.type === 'object' || target.properties || target.allOf))
+      return { kind: 'ref-object', target };
     return { kind: 'ref' };
   }
 
-  if (propSchema.type === 'object' || propSchema.properties || propSchema.allOf) return { kind: 'object', target: propSchema };
+  if (propSchema.type === 'object' || propSchema.properties || propSchema.allOf)
+    return { kind: 'object', target: propSchema };
 
   if (propSchema.type === 'array' && propSchema.items) {
     const it = propSchema.items as SchemaOrRef;

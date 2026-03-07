@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import { generate } from "../lib/extractor.js";
-import { parseCliArgs, cliConfigSubset } from "../lib/config.js";
-import { writeFileSync, existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { ExtractConfig } from "../types/index.js";
+import { generate } from '../lib/extractor.js';
+import { parseCliArgs, cliConfigSubset } from '../lib/config.js';
+import { writeFileSync, existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { ExtractConfig } from '../types/index.js';
 
 function printVersion() {
   try {
@@ -13,50 +13,49 @@ function printVersion() {
     let dir: string;
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      dir =
-        typeof __dirname !== "undefined" ? __dirname : dirname(process.argv[1]);
+      dir = typeof __dirname !== 'undefined' ? __dirname : dirname(process.argv[1]);
     } catch {
       dir = process.cwd();
     }
     let cur = dir;
     let pkg: { version: string } | undefined;
     for (let i = 0; i < 5; i++) {
-      const candidate = join(cur, "package.json");
+      const candidate = join(cur, 'package.json');
       try {
-        pkg = JSON.parse(readFileSync(candidate, "utf8"));
+        pkg = JSON.parse(readFileSync(candidate, 'utf8'));
         break;
       } catch {
         /* next */
       }
       cur = dirname(cur);
     }
-    console.log(pkg?.version ?? "unknown");
+    console.log(pkg?.version ?? 'unknown');
   } catch {
-    console.log("unknown");
+    console.log('unknown');
   }
 }
 
 function printHelp() {
   console.log(
-    `assert-json-body <command> [options]\n\nCommands:\n  extract            Run extraction (default)\n  init-config        Create example assert-json-body.config.json\n  help               Show this help\n  version            Print version\n\nExtraction Options (CLI/env override config.extract):\n  --repo=URL\n  --specPath=PATH\n  --ref=REF                 (branch/tag/sha)\n  --specFile=FILE           (local spec file; skips git checkout)\n  --outputDir=DIR           (default: json-body-assertions)\n  --responsesFile=FILE      (override output file path)\n  --preserveCheckout        (do not delete temp git checkout)\n  --dryRun                  (simulate, no filesystem writes)\n  --failIfExists            (error if responses file exists)\n  --logLevel=VAL            (silent|error|warn|info|debug)\n  --config=FILE             (explicit config file path)\n\nValidation (env overrides only for now):\n  AJB_RECORD / TEST_RESPONSE_BODY_RECORD (enable global recording)\n  AJB_THROW_ON_FAIL (default throw behaviour)\n\nSchema file resolution precedence:\n  explicit option > env (AJB_RESPONSES_FILE / ROUTE_TEST_RESPONSES_FILE) > config.extract.responsesFile or <outputDir>/responses.json > default ./json-body-assertions/responses.json\n`,
+    `assert-json-body <command> [options]\n\nCommands:\n  extract            Run extraction (default)\n  init-config        Create example assert-json-body.config.json\n  help               Show this help\n  version            Print version\n\nExtraction Options (CLI/env override config.extract):\n  --repo=URL\n  --specPath=PATH\n  --ref=REF                 (branch/tag/sha)\n  --specFile=FILE           (local spec file; skips git checkout)\n  --outputDir=DIR           (default: json-body-assertions)\n  --responsesFile=FILE      (override output file path)\n  --preserveCheckout        (do not delete temp git checkout)\n  --dryRun                  (simulate, no filesystem writes)\n  --failIfExists            (error if responses file exists)\n  --logLevel=VAL            (silent|error|warn|info|debug)\n  --config=FILE             (explicit config file path)\n\nValidation (env overrides only for now):\n  AJB_RECORD / TEST_RESPONSE_BODY_RECORD (enable global recording)\n  AJB_THROW_ON_FAIL (default throw behaviour)\n\nSchema file resolution precedence:\n  explicit option > env (AJB_RESPONSES_FILE / ROUTE_TEST_RESPONSES_FILE) > config.extract.responsesFile or <outputDir>/responses.json > default ./json-body-assertions/responses.json\n`
   );
 }
 
 function initConfig() {
-  const path = "assert-json-body.config.json";
+  const path = 'assert-json-body.config.json';
   if (existsSync(path)) {
     console.error(`Config file already exists at ${path}`);
     process.exit(1);
   }
   const example = {
     extract: {
-      repo: "https://github.com/camunda/camunda",
-      specPath: "zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml",
-      ref: "main",
-      outputDir: "json-body-assertions",
+      repo: 'https://github.com/camunda/camunda',
+      specPath: 'zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml',
+      ref: 'main',
+      outputDir: 'json-body-assertions',
       preserveCheckout: false,
       dryRun: false,
-      logLevel: "info",
+      logLevel: 'info',
       failIfExists: false,
     },
     validate: {
@@ -68,25 +67,23 @@ function initConfig() {
   console.log(`Wrote example config to ${path}`);
 
   // Idempotently add npm script to consumer package.json if exists
-  const pkgPath = "package.json";
+  const pkgPath = 'package.json';
   if (existsSync(pkgPath)) {
     try {
-      const raw = readFileSync(pkgPath, "utf8");
+      const raw = readFileSync(pkgPath, 'utf8');
       const pkg = JSON.parse(raw);
       pkg.scripts = pkg.scripts || {};
-      if (pkg.scripts["responses:regenerate"] !== "assert-json-body extract") {
-        pkg.scripts["responses:regenerate"] = "assert-json-body extract";
+      if (pkg.scripts['responses:regenerate'] !== 'assert-json-body extract') {
+        pkg.scripts['responses:regenerate'] = 'assert-json-body extract';
         writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
         console.log('Added script "responses:regenerate" to package.json');
       } else {
-        console.log(
-          'Script "responses:regenerate" already present in package.json',
-        );
+        console.log('Script "responses:regenerate" already present in package.json');
       }
     } catch (e) {
       console.warn(
-        "Could not update package.json with responses:regenerate script:",
-        (e as Error).message,
+        'Could not update package.json with responses:regenerate script:',
+        (e as Error).message
       );
     }
   }
@@ -94,25 +91,21 @@ function initConfig() {
 
 async function run() {
   const { command, args } = parseCliArgs();
-  const baseCommand = command || "extract";
-  if (args.help || baseCommand === "help") return printHelp();
-  if (args.version || baseCommand === "version" || args.v)
-    return printVersion();
-  if (baseCommand === "init-config") return initConfig();
-  if (baseCommand !== "extract") {
+  const baseCommand = command || 'extract';
+  if (args.help || baseCommand === 'help') return printHelp();
+  if (args.version || baseCommand === 'version' || args.v) return printVersion();
+  if (baseCommand === 'init-config') return initConfig();
+  if (baseCommand !== 'extract') {
     console.error(`Unknown command: ${baseCommand}`);
     printHelp();
     process.exit(1);
   }
-  const cfgPath =
-    typeof args.config === "string" ? String(args.config) : undefined;
-  const cliOverrides: ExtractConfig = cliConfigSubset(
-    args as Record<string, string | boolean>,
-  );
+  const cfgPath = typeof args.config === 'string' ? String(args.config) : undefined;
+  const cliOverrides: ExtractConfig = cliConfigSubset(args as Record<string, string | boolean>);
   try {
     await generate(cliOverrides, { configPath: cfgPath });
   } catch (err) {
-    console.error("[assert-json-body] extract failed:", err);
+    console.error('[assert-json-body] extract failed:', err);
     process.exit(1);
   }
 }

@@ -23,20 +23,22 @@
  * fields that are optional in the current spec.
  */
 
-import {readFileSync, readdirSync, statSync} from 'node:fs';
-import {resolve} from 'node:path';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-interface ResponsesFile {responses: ResponseEntry[]}
+interface ResponsesFile {
+  responses: ResponseEntry[];
+}
 interface ResponseEntry {
   path: string;
   method: string;
   status: string;
-  schema: {required: ResponseFieldSpec[]; optional: ResponseFieldSpec[]};
+  schema: { required: ResponseFieldSpec[]; optional: ResponseFieldSpec[] };
 }
 interface ResponseFieldSpec {
   name: string;
   type: string;
-  children?: {required: ResponseFieldSpec[]; optional: ResponseFieldSpec[]};
+  children?: { required: ResponseFieldSpec[]; optional: ResponseFieldSpec[] };
 }
 interface LineEntry {
   route: string;
@@ -58,7 +60,7 @@ if (!recordDir) {
 const RESPONSES_FILE_ENV = process.env.ROUTE_TEST_RESPONSES_FILE;
 const DEFAULT_RESPONSES_PATH = resolve(
   __dirname,
-  '../../response-required-extractor/output/responses.json',
+  '../../response-required-extractor/output/responses.json'
 );
 const RESPONSES_PATH = RESPONSES_FILE_ENV
   ? resolve(process.cwd(), RESPONSES_FILE_ENV)
@@ -82,13 +84,10 @@ function specKey(path: string, method: string, status: string) {
 }
 const specIndex = new Map<string, SpecKeyData>();
 for (const entry of parsedSpec.responses) {
-  specIndex.set(
-    specKey(entry.path, entry.method, entry.status),
-    {
-      required: new Set((entry.schema.required || []).map((f) => f.name)),
-      optional: new Set((entry.schema.optional || []).map((f) => f.name)),
-    },
-  );
+  specIndex.set(specKey(entry.path, entry.method, entry.status), {
+    required: new Set((entry.schema.required || []).map((f) => f.name)),
+    optional: new Set((entry.schema.optional || []).map((f) => f.name)),
+  });
 }
 
 // Aggregate recording presence
@@ -102,11 +101,13 @@ interface Agg {
   deepCounts: Map<string, number>;
 }
 function recKey(route: string, method?: string, status?: string) {
-  return `${(method || 'ANY').toUpperCase()} ${(status || 'ANY')} ${route}`;
+  return `${(method || 'ANY').toUpperCase()} ${status || 'ANY'} ${route}`;
 }
 const aggIndex = new Map<string, Agg>();
 
-function isJsonl(f: string) {return f.endsWith('.jsonl');}
+function isJsonl(f: string) {
+  return f.endsWith('.jsonl');
+}
 
 for (const file of readdirSync(recordDir)) {
   if (!isJsonl(file)) continue;
@@ -138,7 +139,9 @@ for (const file of readdirSync(recordDir)) {
       for (const p of obj.deepPresent || []) {
         a.deepCounts.set(p, (a.deepCounts.get(p) || 0) + 1);
       }
-    } catch {/* ignore malformed */}
+    } catch {
+      /* ignore malformed */
+    }
   }
 }
 
@@ -219,7 +222,7 @@ results.sort(
   (a, b) =>
     a.route.localeCompare(b.route) ||
     a.method.localeCompare(b.method) ||
-    a.status.localeCompare(b.status),
+    a.status.localeCompare(b.status)
 );
 
 const payload = {

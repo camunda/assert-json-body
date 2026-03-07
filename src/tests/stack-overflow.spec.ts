@@ -25,17 +25,30 @@ describe('stack overflow prevention (cyclic schema)', () => {
     // which previously triggered runaway recursion due to redundant traversal logic.
     // Build nested object schema depth N; if validator doesn't guard, may overflow.
     const depth = 400; // large enough to risk stack without protection
-    let current = { name: 'lvl0', type: 'object', children: { required: [] as unknown[], optional: [] as unknown[] } };
+    let current = {
+      name: 'lvl0',
+      type: 'object',
+      children: { required: [] as unknown[], optional: [] as unknown[] },
+    };
     const root = current;
     for (let i = 1; i < depth; i++) {
-      const next = { name: `lvl${i}`, type: 'object', children: { required: [] as unknown[], optional: [] as unknown[] } };
+      const next = {
+        name: `lvl${i}`,
+        type: 'object',
+        children: { required: [] as unknown[], optional: [] as unknown[] },
+      };
       current.children.required.push(next);
       current = next;
     }
     const responsesJson = JSON.stringify({
-      responses: [ {
-        path: '/authentication/me', method: 'GET', status: '200', schema: { required: [ root ], optional: [] }
-      } ]
+      responses: [
+        {
+          path: '/authentication/me',
+          method: 'GET',
+          status: '200',
+          schema: { required: [root], optional: [] },
+        },
+      ],
     });
     writeFileSync(join(outDir, 'responses.json'), responsesJson);
     process.chdir(work);
@@ -44,6 +57,8 @@ describe('stack overflow prevention (cyclic schema)', () => {
 
     // Desired (future) expectation: should not throw.
     // Currently this will trigger a RangeError (Maximum call stack exceeded).
-    expect(() => validateResponseShape({ path: '/authentication/me', method: 'GET', status: '200' }, body)).not.toThrow();
+    expect(() =>
+      validateResponseShape({ path: '/authentication/me', method: 'GET', status: '200' }, body)
+    ).not.toThrow();
   });
 });

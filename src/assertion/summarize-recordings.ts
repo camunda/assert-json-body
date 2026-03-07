@@ -13,8 +13,8 @@
  * to propose fields that appear in N% (default 100%) of observations but are not
  * marked required in the spec-derived artifact.
  */
-import {readdirSync, readFileSync, statSync} from 'node:fs';
-import {resolve} from 'node:path';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 interface LineEntry {
   route: string;
@@ -150,28 +150,19 @@ report.sort(
   (a, b) =>
     a.route.localeCompare(b.route) ||
     a.method.localeCompare(b.method) ||
-    a.status.localeCompare(b.status),
+    a.status.localeCompare(b.status)
 );
 
 // Output JSON for machine usage & a concise human summary
 console.log(
-  JSON.stringify(
-    {thresholdPct, generatedAt: new Date().toISOString(), items: report},
-    null,
-    2,
-  ),
+  JSON.stringify({ thresholdPct, generatedAt: new Date().toISOString(), items: report }, null, 2)
 );
 
 console.error('\n--- Promotion summary (top candidates) ---');
 for (const r of report) {
   const tops = r.promote
     .slice(0, 8)
-    .map(
-      (p) =>
-        `${p.field}(${p.level === 'top' ? 'T' : 'D'}:${p.pct.toFixed(0)}%)`,
-    )
+    .map((p) => `${p.field}(${p.level === 'top' ? 'T' : 'D'}:${p.pct.toFixed(0)}%)`)
     .join(', ');
-  console.error(
-    `${r.method} ${r.status} ${r.route}  samples=${r.samples}  promote: ${tops}`,
-  );
+  console.error(`${r.method} ${r.status} ${r.route}  samples=${r.samples}  promote: ${tops}`);
 }

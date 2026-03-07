@@ -6,13 +6,11 @@
       "status": "200",
       "schema": {
         "required": [
-          {"name": "processInstanceKey", "type": "number"},
-          {"name": "bpmnProcessId", "type": "string"},
-          {"name": "version", "type": "number"}
+          { "name": "processInstanceKey", "type": "number" },
+          { "name": "bpmnProcessId", "type": "string" },
+          { "name": "version", "type": "number" }
         ],
-        "optional": [
-          {"name": "tenantId", "type": "string"}
-        ]
+        "optional": [{ "name": "tenantId", "type": "string" }]
       }
     },
     {
@@ -21,13 +19,18 @@
       "status": "200",
       "schema": {
         "required": [
-          {"name": "items", "type": "array<object>", "children": {"required": [
-            {"name": "processInstanceKey", "type": "number"},
-            {"name": "bpmnProcessId", "type": "string"}
-          ], "optional": [
-            {"name": "tenantId", "type": "string"}
-          ]}},
-          {"name": "count", "type": "number"}
+          {
+            "name": "items",
+            "type": "array<object>",
+            "children": {
+              "required": [
+                { "name": "processInstanceKey", "type": "number" },
+                { "name": "bpmnProcessId", "type": "string" }
+              ],
+              "optional": [{ "name": "tenantId", "type": "string" }]
+            }
+          },
+          { "name": "count", "type": "number" }
         ],
         "optional": []
       }
@@ -38,13 +41,22 @@
       "status": "200",
       "schema": {
         "required": [
-          {"name": "id", "type": "string"},
-          {"name": "state", "type": "string", "enumValues": ["ACTIVE", "DONE"], "underlyingPrimitive": "string"}
+          { "name": "id", "type": "string" },
+          {
+            "name": "state",
+            "type": "string",
+            "enumValues": ["ACTIVE", "DONE"],
+            "underlyingPrimitive": "string"
+          }
         ],
         "optional": [
-          {"name": "description", "type": "string"},
-          {"name": "priority", "type": "number"},
-          {"name": "extra", "type": "object", "children": {"required": [{"name": "flag", "type": "boolean"}], "optional": []}}
+          { "name": "description", "type": "string" },
+          { "name": "priority", "type": "number" },
+          {
+            "name": "extra",
+            "type": "object",
+            "children": { "required": [{ "name": "flag", "type": "boolean" }], "optional": [] }
+          }
         ]
       }
     },
@@ -54,13 +66,13 @@
       "status": "200",
       "schema": {
         "required": [
-          {"name": "id", "type": "string"},
-          {"name": "label", "type": "string", "nullable": true},
-          {"name": "count", "type": "number", "nullable": true}
+          { "name": "id", "type": "string" },
+          { "name": "label", "type": "string", "nullable": true },
+          { "name": "count", "type": "number", "nullable": true }
         ],
         "optional": [
-          {"name": "description", "type": "string", "nullable": true},
-          {"name": "status", "type": "string"}
+          { "name": "description", "type": "string", "nullable": true },
+          { "name": "status", "type": "string" }
         ]
       }
     }

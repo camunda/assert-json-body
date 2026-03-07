@@ -3,7 +3,11 @@ import { recordBody, resolveRecordDirectory } from './recorder.js';
 import { _validateRouteContext } from './validator.js';
 import { RouteContext } from '../types/index.js';
 
-export interface AssertionSpec { path: string; method?: string; status?: string }
+export interface AssertionSpec {
+  path: string;
+  method?: string;
+  status?: string;
+}
 export interface AssertionOptions {
   /** If false, do not throw; instead return { ok:false, errors } */
   throw?: boolean;
@@ -15,14 +19,26 @@ export interface AssertionOptions {
   configPath?: string;
 }
 
-export interface AssertionResult { ok: boolean; errors?: string[] }
+export interface AssertionResult {
+  ok: boolean;
+  errors?: string[];
+}
 
 /**
  * High-level assertion helper: resolves the route spec entry and validates the given body.
  * Throws by default on mismatch; pass { throw:false } to receive a structured result instead.
  */
-export function assertResponseShape(spec: AssertionSpec, body: unknown, options: AssertionOptions = {}): AssertionResult | void {
-  const routeCtx: RouteContext = pickRoute(spec.path, { method: spec.method, status: spec.status, responsesFilePath: options.responsesFilePath, configPath: options.configPath });
+export function assertResponseShape(
+  spec: AssertionSpec,
+  body: unknown,
+  options: AssertionOptions = {}
+): AssertionResult | void {
+  const routeCtx: RouteContext = pickRoute(spec.path, {
+    method: spec.method,
+    status: spec.status,
+    responsesFilePath: options.responsesFilePath,
+    configPath: options.configPath,
+  });
   const wantRecord = !!options.record;
   if (wantRecord) {
     let label: string | undefined;
@@ -31,7 +47,7 @@ export function assertResponseShape(spec: AssertionSpec, body: unknown, options:
     recordBody({ routeCtx, body, label, directory: recordDir });
   }
   try {
-  _validateRouteContext(routeCtx, body);
+    _validateRouteContext(routeCtx, body);
     if (options.throw === false) return { ok: true };
   } catch (err) {
     if (options.throw === false) {

@@ -4,8 +4,12 @@ import { OpenAPIV3 } from 'openapi-types';
 
 // Local helper union & type guards for OpenAPI schemas / refs
 export type SchemaOrRef = OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject;
-function isRef(s: SchemaOrRef | undefined | null): s is OpenAPIV3.ReferenceObject { return !!s && '$ref' in s; }
-function isSchemaObject(s: SchemaOrRef | undefined | null): s is OpenAPIV3.SchemaObject { return !!s && !('$ref' in s); }
+function isRef(s: SchemaOrRef | undefined | null): s is OpenAPIV3.ReferenceObject {
+  return !!s && '$ref' in s;
+}
+function isSchemaObject(s: SchemaOrRef | undefined | null): s is OpenAPIV3.SchemaObject {
+  return !!s && !('$ref' in s);
+}
 
 import { resolveRef } from './ref-resolver.js';
 // Functions here are extracted from original single-file implementation for clarity and testability.
@@ -15,12 +19,21 @@ interface Context {
   doc?: OpenAPIV3.Document;
 }
 
-export function flatten(schema: SchemaOrRef, components: Record<string, SchemaOrRef>, seen = new Set<string>(), doc?: OpenAPIV3.Document): OutputSchema {
+export function flatten(
+  schema: SchemaOrRef,
+  components: Record<string, SchemaOrRef>,
+  seen = new Set<string>(),
+  doc?: OpenAPIV3.Document
+): OutputSchema {
   const { required, optional } = flattenInternal(schema, { components, doc }, seen);
   return { required, optional };
 }
 
-export function flattenInternal(schema: SchemaOrRef, ctx: Context, seen = new Set<string>()): FlattenResult {
+export function flattenInternal(
+  schema: SchemaOrRef,
+  ctx: Context,
+  seen = new Set<string>()
+): FlattenResult {
   if (isRef(schema)) {
     const refKey = schema.$ref;
     if (seen.has(refKey)) return { required: [], optional: [] };
@@ -32,7 +45,11 @@ export function flattenInternal(schema: SchemaOrRef, ctx: Context, seen = new Se
   let reqFields: FieldSpec[] = [];
   let optFields: FieldSpec[] = [];
 
-  const expand = (sch: SchemaOrRef | undefined, acc: OpenAPIV3.SchemaObject[], refSeen: Set<string>) => {
+  const expand = (
+    sch: SchemaOrRef | undefined,
+    acc: OpenAPIV3.SchemaObject[],
+    refSeen: Set<string>
+  ) => {
     if (!sch) return;
     if (isRef(sch)) {
       const refKey = sch.$ref;
@@ -40,14 +57,14 @@ export function flattenInternal(schema: SchemaOrRef, ctx: Context, seen = new Se
       refSeen.add(refKey);
       const target = resolveRef(refKey, ctx.components, ctx.doc);
       if (target) {
-         expand(target, acc, refSeen);
+        expand(target, acc, refSeen);
       }
       return;
     }
     if (sch.allOf) {
-        for (const part of sch.allOf as SchemaOrRef[]) {
-            expand(part, acc, refSeen);
-        }
+      for (const part of sch.allOf as SchemaOrRef[]) {
+        expand(part, acc, refSeen);
+      }
     }
     if (isSchemaObject(sch)) acc.push(sch);
   };
@@ -58,7 +75,7 @@ export function flattenInternal(schema: SchemaOrRef, ctx: Context, seen = new Se
   const collectedRequired = new Set<string>();
   const collectedProps: Record<string, SchemaOrRef> = {};
   for (const s of directSchemas) {
-    for (const r of (s.required || [])) collectedRequired.add(r);
+    for (const r of s.required || []) collectedRequired.add(r);
     if (s.properties) Object.assign(collectedProps, s.properties);
   }
 
@@ -70,15 +87,20 @@ export function flattenInternal(schema: SchemaOrRef, ctx: Context, seen = new Se
       type: normalizeType(rawType),
       ...metadata,
     };
-    if (collectedRequired.has(prop)) reqFields.push(spec); else optFields.push(spec);
+    if (collectedRequired.has(prop)) reqFields.push(spec);
+    else optFields.push(spec);
   }
 
   reqFields = dedupeFields(reqFields);
-  optFields = dedupeFields(optFields.filter(f => !reqFields.some(r => r.name === f.name)));
+  optFields = dedupeFields(optFields.filter((f) => !reqFields.some((r) => r.name === f.name)));
   return { required: reqFields, optional: optFields };
 }
 
-export function describeType(schema: SchemaOrRef | undefined, ctx: Context, stack: string[] = []): string {
+export function describeType(
+  schema: SchemaOrRef | undefined,
+  ctx: Context,
+  stack: string[] = []
+): string {
   if (!schema) return 'unknown';
   if (isRef(schema)) {
     const refKey = schema.$ref;
@@ -101,11 +123,11 @@ export function describeType(schema: SchemaOrRef | undefined, ctx: Context, stac
   }
   if (schema.allOf) {
     const primCandidates: string[] = (schema.allOf as SchemaOrRef[])
-      .map((s)=>primitiveFromSchema(s, ctx, stack))
+      .map((s) => primitiveFromSchema(s, ctx, stack))
       .filter((t: string | null): t is string => !!t && t !== 'object');
     const unique: string[] = [...new Set(primCandidates)];
     if (unique.length === 1) return unique[0];
-    const hasObject = (schema.allOf as SchemaOrRef[]).some((s)=>isObjectLike(s));
+    const hasObject = (schema.allOf as SchemaOrRef[]).some((s) => isObjectLike(s));
     if (hasObject) return 'object';
   }
   if (schema.type === 'object' || schema.properties) return 'object';
@@ -114,11 +136,15 @@ export function describeType(schema: SchemaOrRef | undefined, ctx: Context, stac
     return schema.format ? `${schema.type}(${schema.format})` : schema.type;
   }
   if (schema.oneOf) {
-    const branches = (schema.oneOf as SchemaOrRef[]).map((s)=>normalizeType(describeType(s, ctx, stack)));
+    const branches = (schema.oneOf as SchemaOrRef[]).map((s) =>
+      normalizeType(describeType(s, ctx, stack))
+    );
     return branches.join('|');
   }
   if (schema.anyOf) {
-    const branches = (schema.anyOf as SchemaOrRef[]).map((s)=>normalizeType(describeType(s, ctx, stack)));
+    const branches = (schema.anyOf as SchemaOrRef[]).map((s) =>
+      normalizeType(describeType(s, ctx, stack))
+    );
     return branches.join('|');
   }
   return 'unknown';
@@ -128,7 +154,8 @@ export function deriveFieldMetadata(schema: SchemaOrRef, ctx: Context): Partial<
   const meta: Partial<FieldSpec> = {};
   const collectEnum = (sch: SchemaOrRef | undefined): string[] | undefined => {
     if (!sch) return undefined;
-    if (isSchemaObject(sch) && Array.isArray(sch.enum)) return sch.enum.map((v: unknown) => String(v));
+    if (isSchemaObject(sch) && Array.isArray(sch.enum))
+      return sch.enum.map((v: unknown) => String(v));
     if (isSchemaObject(sch) && sch.allOf) {
       const enums = (sch.allOf as SchemaOrRef[])
         .map((p) => collectEnum(p))
@@ -138,11 +165,16 @@ export function deriveFieldMetadata(schema: SchemaOrRef, ctx: Context): Partial<
     return undefined;
   };
 
-  const detectWrapper = (refKey: string, target: SchemaOrRef | undefined): { underlying?: string; wrapper?: boolean; enumValues?: string[] } => {
+  const detectWrapper = (
+    refKey: string,
+    target: SchemaOrRef | undefined
+  ): { underlying?: string; wrapper?: boolean; enumValues?: string[] } => {
     if (!target) return {};
     const enumValues = collectEnum(target);
     const underlyingPrim = primitiveFromSchema(target, ctx, [refKey]);
-    const isPrimitiveLike = !!underlyingPrim && !(isSchemaObject(target) && (target.properties || target.type === 'object'));
+    const isPrimitiveLike =
+      !!underlyingPrim &&
+      !(isSchemaObject(target) && (target.properties || target.type === 'object'));
     return {
       underlying: underlyingPrim ? normalizeType(underlyingPrim) : undefined,
       wrapper: !!underlyingPrim && isPrimitiveLike,
@@ -177,7 +209,11 @@ export function isObjectLike(s: SchemaOrRef | undefined | null): boolean {
   return !!(s.type === 'object' || s.properties || s.allOf);
 }
 
-export function primitiveFromSchema(schema: SchemaOrRef | undefined, ctx: Context, stack: string[]): string | null {
+export function primitiveFromSchema(
+  schema: SchemaOrRef | undefined,
+  ctx: Context,
+  stack: string[]
+): string | null {
   if (!schema) return null;
   if (isRef(schema)) {
     const refKey = schema.$ref;
@@ -188,21 +224,27 @@ export function primitiveFromSchema(schema: SchemaOrRef | undefined, ctx: Contex
     return rec ?? refKey.split('/').pop()!;
   }
   if (schema.allOf) {
-    const parts = (schema.allOf as SchemaOrRef[]).map((p)=>primitiveFromSchema(p, ctx, stack)).filter(Boolean) as string[];
+    const parts = (schema.allOf as SchemaOrRef[])
+      .map((p) => primitiveFromSchema(p, ctx, stack))
+      .filter(Boolean) as string[];
     const uniq = [...new Set(parts)];
     if (uniq.length === 1) return uniq[0];
-    const bases = [...new Set(uniq.map(u => u.split('(')[0]))];
+    const bases = [...new Set(uniq.map((u) => u.split('(')[0]))];
     if (bases.length === 1) {
-      const withFormat = uniq.filter(u => u.includes('('));
+      const withFormat = uniq.filter((u) => u.includes('('));
       if (withFormat.length === 1) return withFormat[0];
-      return uniq.sort((a,b)=>b.length - a.length)[0];
+      return uniq.sort((a, b) => b.length - a.length)[0];
     }
     return null;
   }
-  if (schema.type && schema.type !== 'object' && !schema.properties && (schema as OpenAPIV3.ArraySchemaObject).items === undefined) {
+  if (
+    schema.type &&
+    schema.type !== 'object' &&
+    !schema.properties &&
+    (schema as OpenAPIV3.ArraySchemaObject).items === undefined
+  ) {
     if (schema.type === 'string') return 'string';
     return schema.format ? `${schema.type}(${schema.format})` : schema.type;
   }
   return null;
 }
-

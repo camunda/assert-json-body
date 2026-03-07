@@ -10,14 +10,18 @@ const doc = {
           '200': {
             content: {
               'application/json': {
-                schema: { type: 'object', properties: { alpha: { type: 'string' } }, required: ['alpha'] }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+                schema: {
+                  type: 'object',
+                  properties: { alpha: { type: 'string' } },
+                  required: ['alpha'],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 describe('extractResponses', () => {

@@ -1,6 +1,6 @@
 /* Unified type definitions combining assertion ResponseFieldSpec and extractor FieldSpec */
 
-export { PlaywrightAPIResponse } from '../assertion/playwright-type'
+export { PlaywrightAPIResponse } from '../assertion/playwright-type';
 
 export interface FieldSpec {
   name: string;
@@ -13,7 +13,10 @@ export interface FieldSpec {
   nullable?: boolean; // true when the OpenAPI schema declares nullable: true
 }
 
-export interface SchemaGroup { required: FieldSpec[]; optional: FieldSpec[] }
+export interface SchemaGroup {
+  required: FieldSpec[];
+  optional: FieldSpec[];
+}
 
 export interface ResponseEntry {
   path: string;
@@ -44,7 +47,10 @@ export interface RouteContext {
   optionalFields: FieldSpec[];
 }
 
-export interface FlattenResult { required: FieldSpec[]; optional: FieldSpec[] }
+export interface FlattenResult {
+  required: FieldSpec[];
+  optional: FieldSpec[];
+}
 
 // ---------------------------
 // Config model (split blocks)
@@ -80,14 +86,26 @@ export interface ConfigFile {
   assert?: Record<string, unknown>;
 }
 
-export interface ResolvedExtractConfig extends Required<Pick<ExtractConfig,
-  'repo' | 'specPath' | 'ref' | 'outputDir' | 'preserveCheckout' | 'dryRun' | 'logLevel' | 'failIfExists'>> {
+export interface ResolvedExtractConfig extends Required<
+  Pick<
+    ExtractConfig,
+    | 'repo'
+    | 'specPath'
+    | 'ref'
+    | 'outputDir'
+    | 'preserveCheckout'
+    | 'dryRun'
+    | 'logLevel'
+    | 'failIfExists'
+  >
+> {
   responsesFile?: string;
   specFile?: string;
 }
 
-export type ResolvedValidateConfig = Required<Pick<ValidateConfig,
-  'recordResponses' | 'throwOnValidationFail'>>
+export type ResolvedValidateConfig = Required<
+  Pick<ValidateConfig, 'recordResponses' | 'throwOnValidationFail'>
+>;
 
 export interface ResolvedConfig {
   extract: ResolvedExtractConfig;

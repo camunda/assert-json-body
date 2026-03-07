@@ -1,7 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { ExtractConfig, ValidateConfig, ConfigFile, ResolvedExtractConfig, ResolvedValidateConfig, ConfigResolution, ResolvedConfig } from '../types/index.js';
+import {
+  ExtractConfig,
+  ValidateConfig,
+  ConfigFile,
+  ResolvedExtractConfig,
+  ResolvedValidateConfig,
+  ConfigResolution,
+  ResolvedConfig,
+} from '../types/index.js';
 
 const CONFIG_FILENAME = 'assert-json-body.config.json';
 
@@ -22,7 +30,10 @@ const DEFAULT_VALIDATE: ResolvedValidateConfig = {
   throwOnValidationFail: true,
 };
 
-export function loadConfigFile(cwd: string = process.cwd(), explicitPath?: string): { filePath?: string; file?: ConfigFile; error?: Error } {
+export function loadConfigFile(
+  cwd: string = process.cwd(),
+  explicitPath?: string
+): { filePath?: string; file?: ConfigFile; error?: Error } {
   const path = explicitPath ? resolve(cwd, explicitPath) : resolve(cwd, CONFIG_FILENAME);
   if (!existsSync(path)) return {};
   try {
@@ -34,15 +45,23 @@ export function loadConfigFile(cwd: string = process.cwd(), explicitPath?: strin
   }
 }
 
-export function parseCliArgs(argv: string[] = process.argv.slice(2)): { command?: string; args: Record<string,string|boolean>; positionals: string[] } {
-  const args: Record<string,string|boolean> = {};
+export function parseCliArgs(argv: string[] = process.argv.slice(2)): {
+  command?: string;
+  args: Record<string, string | boolean>;
+  positionals: string[];
+} {
+  const args: Record<string, string | boolean> = {};
   const positionals: string[] = [];
   let command: string | undefined;
   for (const token of argv) {
-    if (!command && !token.startsWith('-')) { command = token; continue; }
+    if (!command && !token.startsWith('-')) {
+      command = token;
+      continue;
+    }
     if (token.startsWith('--')) {
       const [k, v] = token.slice(2).split('=');
-      if (v === undefined) args[k] = true; else args[k] = v;
+      if (v === undefined) args[k] = true;
+      else args[k] = v;
     } else if (token.startsWith('-')) {
       const flags = token.slice(1).split('');
       for (const f of flags) args[f] = true;
@@ -53,20 +72,35 @@ export function parseCliArgs(argv: string[] = process.argv.slice(2)): { command?
   return { command, args, positionals };
 }
 
-function pick(obj: Record<string,string|boolean>, keys: string[]): ExtractConfig {
+function pick(obj: Record<string, string | boolean>, keys: string[]): ExtractConfig {
   const out: ExtractConfig = {};
   for (const k of keys) if (k in obj) (out as any)[k] = obj[k];
   return out;
 }
 
-export function cliConfigSubset(raw: Record<string,string|boolean>): ExtractConfig {
-  return pick(raw, ['repo','specPath','ref','outputDir','preserveCheckout','dryRun','responsesFile','logLevel','failIfExists','specFile']);
+export function cliConfigSubset(raw: Record<string, string | boolean>): ExtractConfig {
+  return pick(raw, [
+    'repo',
+    'specPath',
+    'ref',
+    'outputDir',
+    'preserveCheckout',
+    'dryRun',
+    'responsesFile',
+    'logLevel',
+    'failIfExists',
+    'specFile',
+  ]);
 }
 
-export function envConfigSubset(env: NodeJS.ProcessEnv = process.env): { extract: ExtractConfig; validate: ValidateConfig } {
-  const map: Record<string,string> = {};
-  for (const [k,v] of Object.entries(env)) if (typeof v === 'string') map[k] = v;
-  const getBool = (k: string): boolean | undefined => map[k] ? /^(1|true|yes)$/i.test(map[k]) : undefined;
+export function envConfigSubset(env: NodeJS.ProcessEnv = process.env): {
+  extract: ExtractConfig;
+  validate: ValidateConfig;
+} {
+  const map: Record<string, string> = {};
+  for (const [k, v] of Object.entries(env)) if (typeof v === 'string') map[k] = v;
+  const getBool = (k: string): boolean | undefined =>
+    map[k] ? /^(1|true|yes)$/i.test(map[k]) : undefined;
   const extract: ExtractConfig = {};
   const repo = map.AJB_REPO ?? map.REPO;
   if (repo !== undefined) extract.repo = repo;
@@ -102,19 +136,35 @@ export function envConfigSubset(env: NodeJS.ProcessEnv = process.env): { extract
 }
 
 function coerceExtract(config: ExtractConfig, warnings: string[]): ExtractConfig {
-  if (typeof config.preserveCheckout === 'string') config.preserveCheckout = /^(1|true|yes)$/i.test(config.preserveCheckout);
+  if (typeof config.preserveCheckout === 'string')
+    config.preserveCheckout = /^(1|true|yes)$/i.test(config.preserveCheckout);
   if (typeof config.dryRun === 'string') config.dryRun = /^(1|true|yes)$/i.test(config.dryRun);
-  if (typeof config.failIfExists === 'string') config.failIfExists = /^(1|true|yes)$/i.test(config.failIfExists);
-  if (config.logLevel && !['silent','error','warn','info','debug'].includes(config.logLevel)) {
+  if (typeof config.failIfExists === 'string')
+    config.failIfExists = /^(1|true|yes)$/i.test(config.failIfExists);
+  if (config.logLevel && !['silent', 'error', 'warn', 'info', 'debug'].includes(config.logLevel)) {
     warnings.push(`Unknown logLevel '${config.logLevel}', falling back to 'info'`);
     config.logLevel = 'info';
   }
   return config;
 }
 
-export function resolveConfig(parts: { file?: ConfigFile; cli: ExtractConfig; env: { extract: ExtractConfig; validate: ValidateConfig }; warnings: string[] }): ResolvedConfig {
-  const mergedExtract: ExtractConfig = { ...DEFAULT_EXTRACT, ...(parts.file?.extract||{}), ...parts.cli, ...parts.env.extract };
-  const mergedValidate: ValidateConfig = { ...DEFAULT_VALIDATE, ...(parts.file?.validate||{}), ...parts.env.validate };
+export function resolveConfig(parts: {
+  file?: ConfigFile;
+  cli: ExtractConfig;
+  env: { extract: ExtractConfig; validate: ValidateConfig };
+  warnings: string[];
+}): ResolvedConfig {
+  const mergedExtract: ExtractConfig = {
+    ...DEFAULT_EXTRACT,
+    ...(parts.file?.extract || {}),
+    ...parts.cli,
+    ...parts.env.extract,
+  };
+  const mergedValidate: ValidateConfig = {
+    ...DEFAULT_VALIDATE,
+    ...(parts.file?.validate || {}),
+    ...parts.env.validate,
+  };
   coerceExtract(mergedExtract, parts.warnings);
   const extract: ResolvedExtractConfig = {
     repo: mergedExtract.repo || DEFAULT_EXTRACT.repo,
@@ -130,7 +180,8 @@ export function resolveConfig(parts: { file?: ConfigFile; cli: ExtractConfig; en
   };
   const validate: ResolvedValidateConfig = {
     recordResponses: mergedValidate.recordResponses ?? DEFAULT_VALIDATE.recordResponses,
-    throwOnValidationFail: mergedValidate.throwOnValidationFail ?? DEFAULT_VALIDATE.throwOnValidationFail,
+    throwOnValidationFail:
+      mergedValidate.throwOnValidationFail ?? DEFAULT_VALIDATE.throwOnValidationFail,
   };
   return { extract, validate };
 }

@@ -9,8 +9,8 @@ export default [
       'dist/**',
       'dist-cjs/**',
       'json-body-assertions/**', // generated extraction output
-      'node_modules/**'
-    ]
+      'node_modules/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -21,15 +21,15 @@ export default [
       parserOptions: {
         project: false,
         ecmaVersion: 'latest',
-        sourceType: 'module'
+        sourceType: 'module',
       },
       globals: {
         ...globals.node,
-        ...globals.browser
-      }
+        ...globals.browser,
+      },
     },
     rules: {
-      'no-console': 'off'
-    }
-  }
+      'no-console': 'off',
+    },
+  },
 ];

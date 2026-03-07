@@ -6,13 +6,13 @@ info:
   contact:
     email: chuck@chucknorris.com
 servers:
-  - url: "{schema}://{host}:{port}/v2"
+  - url: '{schema}://{host}:{port}/v2'
     variables:
       host:
         default: localhost
         description: The hostname of the Orchestration Cluster REST Gateway.
       port:
-        default: "8080"
+        default: '8080'
         description: The port of the Orchestration Cluster REST API server.
       schema:
         default: http
