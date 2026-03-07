@@ -126,38 +126,35 @@ npm run build:deno          # local platform
 npm run build:deno:cross    # all platforms
 ```
 
-#### Using the binary with a local spec file (e.g. `camunda/camunda` CI)
+#### Using the binary with a local spec file (`AJB_SPEC_FILE`)
 
-When the OpenAPI spec is already available on disk — for example, in a workflow that checks out the `camunda/camunda` repository — you can skip the git sparse-checkout entirely by pointing at the local file with `AJB_SPEC_FILE`:
-
-```yaml
-name: Regenerate API response schemas
-on:
-  pull_request:
-    paths:
-      - 'zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml'
-
-jobs:
-  regenerate-schemas:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout camunda/camunda
-        uses: actions/checkout@v4
-
-      - name: Download assert-json-body
-        run: |
-          curl -fsSL -o assert-json-body \
-            "https://github.com/camunda/assert-json-body/releases/latest/download/assert-json-body-x86_64-unknown-linux-gnu"
-          chmod +x assert-json-body
-
-      - name: Regenerate response schemas
-        run: ./assert-json-body extract
-        env:
-          AJB_SPEC_FILE: zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml
-          AJB_OUTPUT_DIR: my-project/json-body-assertions
-```
+When the OpenAPI spec is already available on disk — for example, in a workflow that checks out the `camunda/camunda` repository — you can skip the git sparse-checkout entirely by pointing at the local file with `AJB_SPEC_FILE`.
 
 When `specFile` (or `AJB_SPEC_FILE`) is set, the `repo`, `specPath`, `ref`, and `preserveCheckout` options are ignored — no git operations are performed. The generated `responses.json` metadata will show `commit: "local"` instead of a SHA.
+
+#### Copy-paste for `camunda/camunda` QA e2e workflows
+
+The orchestration-cluster e2e test suite lives at `qa/c8-orchestration-cluster-e2e-test-suite/` and already checks out the branch under test. The spec file is at `zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml` in the repo root. Add these steps **before** `npm install` / `npm run test`:
+
+```yaml
+      # ── Regenerate response schemas from the branch's spec ──────────
+      - name: Download assert-json-body binary
+        run: |
+          curl -fsSL -o /usr/local/bin/assert-json-body \
+            "https://github.com/camunda/assert-json-body/releases/latest/download/assert-json-body-x86_64-unknown-linux-gnu"
+          chmod +x /usr/local/bin/assert-json-body
+
+      - name: Regenerate response schemas from local spec
+        run: assert-json-body extract
+        env:
+          AJB_SPEC_FILE: ${{ github.workspace }}/zeebe/gateway-protocol/src/main/proto/v2/rest-api.yaml
+          AJB_OUTPUT_DIR: ${{ github.workspace }}/qa/c8-orchestration-cluster-e2e-test-suite/json-body-assertions
+      # ────────────────────────────────────────────────────────────────
+```
+
+That's it — no Node.js setup, no `npm install`, and no second git clone required. The binary reads the spec file that is already on disk from the workflow's checkout step and writes `responses.json` directly into the test suite's `json-body-assertions/` directory.
+
+**Why this works:** The e2e workflows (nightly matrix across `stable/8.6` … `main`, on-demand branch, release) already `actions/checkout` the target branch. The OpenAPI spec in that checkout reflects the branch's API surface, so the generated response schemas will match the server under test.
 
 ## Configuration
 
