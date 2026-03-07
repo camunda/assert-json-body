@@ -238,13 +238,13 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
   }
 }
 
-// Runtime main guard (ESM safe). For CJS compiled output we skip auto-exec to avoid import.meta requirement.
+// Runtime main guard (ESM safe). For CJS compiled output we skip auto-exec
+// by hiding import.meta behind eval() so tsc --module CommonJS doesn't error.
 try {
-  // Access import.meta.url only in ESM environments.
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const thisUrl: string | undefined =
-    typeof import.meta !== 'undefined' ? import.meta.url : undefined;
+  // eslint-disable-next-line no-eval
+  const thisUrl: string | undefined = eval(
+    'typeof import.meta !== "undefined" ? import.meta.url : undefined'
+  );
   if (thisUrl) {
     const isMain = process.argv[1] && fileURLToPath(thisUrl) === process.argv[1];
     if (isMain) {
@@ -252,5 +252,5 @@ try {
     }
   }
 } catch {
-  /* ignore */
+  /* ignore — CJS or bundled environment */
 }
