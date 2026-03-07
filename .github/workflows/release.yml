@@ -14,6 +14,9 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      new-release-published: ${{ steps.detect.outputs.new_release_published }}
+      new-release-version: ${{ steps.detect.outputs.new_release_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,8 +53,59 @@ jobs:
       - name: Build
         run: npm run build --silent
 
+      - name: Record pre-release version
+        id: pre
+        run: echo "version=$(node -p 'require("./package.json").version')" >> "$GITHUB_OUTPUT"
+
       - name: Release
+        id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
         run: npx semantic-release
+
+      - name: Detect new release
+        id: detect
+        run: |
+          NEW_VERSION=$(node -p 'require("./package.json").version')
+          if [[ "$NEW_VERSION" != "${{ steps.pre.outputs.version }}" ]]; then
+            echo "new_release_published=true" >> "$GITHUB_OUTPUT"
+            echo "new_release_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_release_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  deno-binaries:
+    needs: release
+    if: needs.release.outputs.new-release-published == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - aarch64-unknown-linux-gnu
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+          - x86_64-pc-windows-msvc
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Compile binary
+        run: ./scripts/build-deno.sh --target ${{ matrix.target }}
+
+      - name: Upload binary to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.release.outputs.new-release-version }}
+          files: dist-bin/*
