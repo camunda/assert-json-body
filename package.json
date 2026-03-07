@@ -45,10 +45,10 @@
     "test:watch": "vitest -c vitest.config.ts",
     "test:integration": "vitest run -c vitest.config.integration.ts",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix && prettier --write .",
     "format": "prettier --write .",
-    "prepare": "npm run build",
-    "release": "semantic-release",
-    "prepare:husky": "husky install"
+    "prepare": "husky && npm run build",
+    "release": "semantic-release"
   },
   "repository": {
     "type": "git",
@@ -94,8 +94,13 @@
     "semantic-release": "^25.0.2",
     "tsx": "^4.7.0",
     "typescript": "^5.4.5",
+    "lint-staged": "^16.3.2",
     "typescript-eslint": "^8.44.1",
     "vitest": "^2.0.5"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs,cjs}": ["eslint --fix"],
+    "*.{ts,js,mjs,cjs,json,md,yaml,yml}": ["prettier --write"]
   },
   "publishConfig": {
     "access": "public",

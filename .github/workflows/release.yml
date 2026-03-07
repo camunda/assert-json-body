@@ -33,8 +33,16 @@ jobs:
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: npm audit signatures
 
-      - name: Lint
-        run: npm run lint --silent
+      - name: Lint & format (auto-fix)
+        run: npm run lint:fix --silent
+
+      - name: Fail if lint:fix produced changes
+        run: |
+          if ! git diff --quiet; then
+            echo "::error::Lint/format fixes were needed. Run 'npm run lint:fix' locally and commit."
+            git diff --stat
+            exit 1
+          fi
 
       - name: Test
         run: npm test --silent
