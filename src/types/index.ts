@@ -86,19 +86,20 @@ export interface ConfigFile {
   assert?: Record<string, unknown>;
 }
 
-export interface ResolvedExtractConfig extends Required<
-  Pick<
-    ExtractConfig,
-    | 'repo'
-    | 'specPath'
-    | 'ref'
-    | 'outputDir'
-    | 'preserveCheckout'
-    | 'dryRun'
-    | 'logLevel'
-    | 'failIfExists'
-  >
-> {
+export interface ResolvedExtractConfig
+  extends Required<
+    Pick<
+      ExtractConfig,
+      | 'repo'
+      | 'specPath'
+      | 'ref'
+      | 'outputDir'
+      | 'preserveCheckout'
+      | 'dryRun'
+      | 'logLevel'
+      | 'failIfExists'
+    >
+  > {
   responsesFile?: string;
   specFile?: string;
 }
