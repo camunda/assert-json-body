@@ -1,3 +1,9 @@
+## [1.7.1](https://github.com/camunda/assert-json-body/compare/v1.7.0...v1.7.1) (2026-03-07)
+
+### Bug Fixes
+
+- build binaries on release ([1a6a64a](https://github.com/camunda/assert-json-body/commit/1a6a64a7d3babf96c83f3411d2435d591859b632))
+
 # [1.7.0](https://github.com/camunda/assert-json-body/compare/v1.6.2...v1.7.0) (2026-03-07)
 
 ### Bug Fixes
