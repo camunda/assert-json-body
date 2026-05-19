@@ -310,6 +310,7 @@ if (!r2.ok) {
 - `responsesFilePath` / `configPath` – override resolution
 - `throw?: boolean` – override global throw setting
 - `record?: boolean | { label?: string }` – enable recording for this call
+- `truncateValidationErrors?: boolean` – defaults to `true`; set `false` to include every validation error
 
 ### `validateResponse(spec, playwrightResponse, options?)`
 

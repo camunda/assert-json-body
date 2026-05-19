@@ -9,6 +9,8 @@ const log = debug('validator');
 
 interface ValidationOptions {
   arraySampleLimit: number;
+  truncateErrors: boolean;
+  errorPreviewLimit: number;
 }
 
 const isPrimitive = (t: string): t is 'string' | 'number' | 'boolean' =>
@@ -41,7 +43,11 @@ const actualDescriptor = (val: unknown): string => {
   return typeof val;
 };
 
-function _validateRouteContext(routeCtx: RouteContext, body: unknown) {
+function _validateRouteContext(
+  routeCtx: RouteContext,
+  body: unknown,
+  validationOptions: Partial<Pick<ValidationOptions, 'truncateErrors'>> = {}
+) {
   if (
     !routeCtx.route ||
     (routeCtx.requiredFields.length === 0 && routeCtx.optionalFields.length === 0)
@@ -52,7 +58,11 @@ function _validateRouteContext(routeCtx: RouteContext, body: unknown) {
       `Expected object response body to validate route required fields for ${routeCtx.route}`
     );
   }
-  const options: ValidationOptions = { arraySampleLimit: 25 };
+  const options: ValidationOptions = {
+    arraySampleLimit: 25,
+    truncateErrors: validationOptions.truncateErrors ?? true,
+    errorPreviewLimit: 15,
+  };
   const errors: string[] = [];
   const checkPrimitiveType = (val: unknown, expected: string): boolean => typeof val === expected;
   const validateGroup = (
@@ -223,8 +233,12 @@ function _validateRouteContext(routeCtx: RouteContext, body: unknown) {
     validateGroup(body as Record<string, unknown>, routeCtx.optionalFields, '', 'optional-present');
   }
   if (errors.length) {
-    const preview = errors.slice(0, 15).join('\n');
-    const extra = errors.length > 15 ? `\n...and ${errors.length - 15} more` : '';
+    const errorLimit = options.truncateErrors ? options.errorPreviewLimit : errors.length;
+    const preview = errors.slice(0, errorLimit).join('\n');
+    const extra =
+      options.truncateErrors && errors.length > errorLimit
+        ? `\n...and ${errors.length - errorLimit} more`
+        : '';
     throw new Error(
       `Response shape errors for route ${routeCtx.method || '*'} ${routeCtx.status || '*'} ${routeCtx.route}:\n${preview}${extra}`
     );
@@ -238,6 +252,7 @@ export interface ValidateOptions {
   status?: string;
   throw?: boolean;
   record?: boolean | { label?: string };
+  truncateValidationErrors?: boolean;
 }
 
 /**
@@ -277,7 +292,9 @@ export function validateResponseShape(
     recordBody({ routeCtx, body, label, directory: recordDir });
   }
   try {
-    _validateRouteContext(routeCtx, body);
+    _validateRouteContext(routeCtx, body, {
+      truncateErrors: options.truncateValidationErrors,
+    });
     const validation = { ok: true, response: body, routeContext: routeCtx };
     log(JSON.stringify(validation, null, 2));
     return validation;
