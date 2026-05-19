@@ -130,7 +130,11 @@ describe('validator negative cases (framework-agnostic)', () => {
   });
 
   it('can return all validation errors without truncation', () => {
-    const body = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`extra${i}`, i]));
+    const extraFields = 20;
+    const missingRequiredFields = 3;
+    const body = Object.fromEntries(
+      Array.from({ length: extraFields }, (_, i) => [`extra${i}`, i])
+    );
     const result = validateResponseShape(
       { path: '/process-instance/create', method: 'POST', status: '200' },
       body,
@@ -141,7 +145,7 @@ describe('validator negative cases (framework-agnostic)', () => {
       }
     );
     expect(result.ok).toBe(false);
-    expect(result.errors).toHaveLength(23);
+    expect(result.errors).toHaveLength(extraFields + missingRequiredFields);
     expect(result.errors).toContain('[EXTRA] /extra19 is not declared in spec');
     expect(result.errors?.some((line) => line.startsWith('...and'))).toBe(false);
   });

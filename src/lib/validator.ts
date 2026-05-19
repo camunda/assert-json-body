@@ -9,7 +9,7 @@ const log = debug('validator');
 
 interface ValidationOptions {
   arraySampleLimit: number;
-  truncateErrors: boolean;
+  truncateValidationErrors: boolean;
   errorPreviewLimit: number;
 }
 
@@ -46,7 +46,7 @@ const actualDescriptor = (val: unknown): string => {
 function _validateRouteContext(
   routeCtx: RouteContext,
   body: unknown,
-  validationOptions: Partial<Pick<ValidationOptions, 'truncateErrors'>> = {}
+  validationOptions: Partial<Pick<ValidationOptions, 'truncateValidationErrors'>> = {}
 ) {
   if (
     !routeCtx.route ||
@@ -60,7 +60,7 @@ function _validateRouteContext(
   }
   const options: ValidationOptions = {
     arraySampleLimit: 25,
-    truncateErrors: validationOptions.truncateErrors ?? true,
+    truncateValidationErrors: validationOptions.truncateValidationErrors ?? true,
     errorPreviewLimit: 15,
   };
   const errors: string[] = [];
@@ -233,10 +233,10 @@ function _validateRouteContext(
     validateGroup(body as Record<string, unknown>, routeCtx.optionalFields, '', 'optional-present');
   }
   if (errors.length) {
-    const errorLimit = options.truncateErrors ? options.errorPreviewLimit : errors.length;
+    const errorLimit = options.truncateValidationErrors ? options.errorPreviewLimit : errors.length;
     const preview = errors.slice(0, errorLimit).join('\n');
     const extra =
-      options.truncateErrors && errors.length > errorLimit
+      options.truncateValidationErrors && errors.length > errorLimit
         ? `\n...and ${errors.length - errorLimit} more`
         : '';
     throw new Error(
@@ -293,7 +293,7 @@ export function validateResponseShape(
   }
   try {
     _validateRouteContext(routeCtx, body, {
-      truncateErrors: options.truncateValidationErrors,
+      truncateValidationErrors: options.truncateValidationErrors,
     });
     const validation = { ok: true, response: body, routeContext: routeCtx };
     log(JSON.stringify(validation, null, 2));
