@@ -1,3 +1,9 @@
+# [1.8.0](https://github.com/camunda/assert-json-body/compare/v1.7.1...v1.8.0) (2026-05-19)
+
+### Features
+
+- add option to disable validation error truncation ([487cdf3](https://github.com/camunda/assert-json-body/commit/487cdf3040ee3c4b57965c2e10db25bfbd1c5fdc))
+
 ## [1.7.1](https://github.com/camunda/assert-json-body/compare/v1.7.0...v1.7.1) (2026-03-07)
 
 ### Bug Fixes
