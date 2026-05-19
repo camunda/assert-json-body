@@ -117,6 +117,38 @@ describe('validator negative cases (framework-agnostic)', () => {
       )
     ).toThrow(/EXTRA/);
   });
+
+  it('truncates validation errors by default after 15 entries', () => {
+    const body = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`extra${i}`, i]));
+    expect(() =>
+      validateResponseShape(
+        { path: '/process-instance/create', method: 'POST', status: '200' },
+        body,
+        { responsesFilePath: responsesFile }
+      )
+    ).toThrow(/\.\.\.and 8 more/);
+  });
+
+  it('can return all validation errors without truncation', () => {
+    const extraFields = 20;
+    const missingRequiredFields = 3;
+    const body = Object.fromEntries(
+      Array.from({ length: extraFields }, (_, i) => [`extra${i}`, i])
+    );
+    const result = validateResponseShape(
+      { path: '/process-instance/create', method: 'POST', status: '200' },
+      body,
+      {
+        throw: false,
+        responsesFilePath: responsesFile,
+        truncateValidationErrors: false,
+      }
+    );
+    expect(result.ok).toBe(false);
+    expect(result.errors).toHaveLength(extraFields + missingRequiredFields);
+    expect(result.errors).toContain('[EXTRA] /extra19 is not declared in spec');
+    expect(result.errors?.some((line) => line.startsWith('...and'))).toBe(false);
+  });
 });
 
 describe('validateResponse helper (Playwright adapter)', () => {

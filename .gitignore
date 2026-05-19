@@ -2,5 +2,5 @@ node_modules
 dist
 dist-cjs
 dist-bin
-*.tsbuildinfo.DS_Store
+*.tsbuildinfo
 .DS_Store*
