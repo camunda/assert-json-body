@@ -6,6 +6,7 @@ import debug from 'debug';
 import { PlaywrightAPIResponse } from '../assertion/playwright-type.js';
 
 const log = debug('validator');
+const ERROR_PREVIEW_LIMIT = 15;
 
 interface ValidationOptions {
   arraySampleLimit: number;
@@ -61,7 +62,7 @@ function _validateRouteContext(
   const options: ValidationOptions = {
     arraySampleLimit: 25,
     truncateValidationErrors: validationOptions.truncateValidationErrors ?? true,
-    errorPreviewLimit: 15,
+    errorPreviewLimit: ERROR_PREVIEW_LIMIT,
   };
   const errors: string[] = [];
   const checkPrimitiveType = (val: unknown, expected: string): boolean => typeof val === expected;
