@@ -193,7 +193,7 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
           `export interface TypedRouteSpec<P extends RoutePath = RoutePath, M extends MethodFor<P> = MethodFor<P>, S extends StatusFor<P, M> = StatusFor<P, M>> {\n` +
           `  path: P;\n  method: M;\n  status: S;\n}` +
           '\n\n' +
-          `export function validateResponseShape<P extends RoutePath, M extends MethodFor<P>, S extends StatusFor<P,M>>(spec: { path: P; method: M; status: S }, body: unknown, options?: { responsesFilePath?: string; configPath?: string; throw?: boolean; record?: boolean | { label?: string } }) {\n` +
+          `export function validateResponseShape<P extends RoutePath, M extends MethodFor<P>, S extends StatusFor<P,M>>(spec: { path: P; method: M; status: S }, body: unknown, options?: { responsesFilePath?: string; configPath?: string; throw?: boolean; record?: boolean | { label?: string }; truncateValidationErrors?: boolean }) {\n` +
           `  // Cast to base signature (method/status widened to string) for internal call.\n` +
           `  const baseFn = _baseValidateResponseShape;\n` +
           `  if (baseFn === (validateResponseShape as unknown)) {\n` +
@@ -203,7 +203,7 @@ export async function generate(cfg?: ExtractConfig, options?: { configPath?: str
           `  }\n` +
           `  return baseFn(spec as unknown as { path: string; method?: string; status?: string }, body, options);\n}` +
           '\n' +
-          `export function validateResponse<P extends RoutePath, M extends MethodFor<P>, S extends StatusFor<P,M>>(spec: { path: P; method: M; status: S }, response: PlaywrightAPIResponse, options?: { responsesFilePath?: string; configPath?: string; throw?: boolean; record?: boolean | { label?: string } }) {\n` +
+          `export function validateResponse<P extends RoutePath, M extends MethodFor<P>, S extends StatusFor<P,M>>(spec: { path: P; method: M; status: S }, response: PlaywrightAPIResponse, options?: { responsesFilePath?: string; configPath?: string; throw?: boolean; record?: boolean | { label?: string }; truncateValidationErrors?: boolean }) {\n` +
           `  return _baseValidateResponse(spec, response, options)\n}`;
         writeFileSync(join(outDir, 'index.ts'), indexSource);
       } catch (e) {
