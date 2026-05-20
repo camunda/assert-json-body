@@ -1,3 +1,9 @@
+## [1.8.1](https://github.com/camunda/assert-json-body/compare/v1.8.0...v1.8.1) (2026-05-20)
+
+### Bug Fixes
+
+- update generated typed wrapper options ([0250246](https://github.com/camunda/assert-json-body/commit/0250246051dc2be8ac9d2763a9e13e1ed8807738))
+
 # [1.8.0](https://github.com/camunda/assert-json-body/compare/v1.7.1...v1.8.0) (2026-05-19)
 
 ### Features
